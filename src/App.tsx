@@ -6,9 +6,10 @@ import { ShiftSelector } from '@/components/dashboard/ShiftSelector';
 import { LessonList } from '@/components/dashboard/LessonList';
 import { StatusPill } from '@/components/dashboard/StatusPill';
 import { SettingsPage } from '@/components/settings/SettingsPage';
-import { LoginPage } from '@/components/auth/LoginPage'; // Import Login
+import { LoginPage } from '@/components/auth/LoginPage';
 import type { AppState, Language } from '@/types';
 import { parse, isWithinInterval, format } from 'date-fns';
+import { i18n } from '@/lib/i18n';
 
 import { INITIAL_STATE } from '@/initialState';
 
@@ -67,7 +68,10 @@ function App() {
 
   // Logic: Calculate Status
   const getStatus = (): { text: string; activeLessonId?: string } => {
-    if (!activeLessons.length) return { text: 'Darslar mavjud emas' };
+    // Localization helper
+    const t = i18n[state.language];
+
+    if (!activeLessons.length) return { text: t.noLessons };
 
     const todayStr = format(now, 'yyyy-MM-dd');
 
@@ -77,37 +81,37 @@ function App() {
     // Check if finished
     const lastLesson = sorted[sorted.length - 1];
     const lastEnd = parse(`${todayStr} ${lastLesson.endTime}`, 'yyyy-MM-dd HH:mm', now);
-    if (now > lastEnd) return { text: 'Darslar tugadi' };
+    if (now > lastEnd) return { text: t.finished };
 
     // Check if not started
     const firstLesson = sorted[0];
     const firstStart = parse(`${todayStr} ${firstLesson.startTime}`, 'yyyy-MM-dd HH:mm', now);
-    if (now < firstStart) return { text: 'Darslar boshlanmadi' };
+    if (now < firstStart) return { text: t.notStarted };
 
     // Check if inside a lesson
     for (const lesson of sorted) {
       const start = parse(`${todayStr} ${lesson.startTime}`, 'yyyy-MM-dd HH:mm', now);
       const end = parse(`${todayStr} ${lesson.endTime}`, 'yyyy-MM-dd HH:mm', now);
       if (isWithinInterval(now, { start, end })) {
-        return { text: `${lesson.name} davom etmoqda`, activeLessonId: lesson.id };
+        return { text: `${lesson.name}`, activeLessonId: lesson.id };
       }
     }
 
     // Must be break
-    return { text: 'Tanaffus' };
+    return { text: t.break };
   };
 
   const status = getStatus();
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center p-2 sm:p-4 transition-colors duration-300">
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center transition-colors duration-300">
       <Toaster position="top-right" />
 
       {!isAuthenticated ? (
         <LoginPage onLogin={handleLoginSuccess} />
       ) : (
         currentView === 'dashboard' ? (
-          <div className="w-full max-w-5xl space-y-4 md:space-y-6 flex flex-col items-center">
+          <>
             <Header
               schoolName={state.config.schoolName}
               subtitle={state.config.subtitle}
@@ -118,30 +122,34 @@ function App() {
               onSettingsClick={() => setCurrentView('settings')}
             />
 
-            <div className="flex flex-col items-center gap-4 md:gap-6 w-full px-2 sm:px-4">
-              <DaySelector
-                selectedDay={state.selectedDay}
-                onSelect={(day) => setState(prev => ({ ...prev, selectedDay: day }))}
-              />
+            <main className="w-full max-w-4xl px-4 pb-20 space-y-8 flex flex-col items-center mt-6">
+              <section className="w-full">
+                <DaySelector
+                  selectedDay={state.selectedDay}
+                  onSelect={(day) => setState(prev => ({ ...prev, selectedDay: day }))}
+                  language={state.language}
+                />
+              </section>
 
-              <ShiftSelector
-                selectedShift={state.selectedShift}
-                onSelect={(shift) => setState(prev => ({ ...prev, selectedShift: shift }))}
-              />
+              <section className="flex flex-col items-center gap-6 w-full animate-in slide-in-from-bottom-4 duration-500">
+                <ShiftSelector
+                  selectedShift={state.selectedShift}
+                  onSelect={(shift) => setState(prev => ({ ...prev, selectedShift: shift }))}
+                  language={state.language}
+                />
 
-              <StatusPill status={status.text} />
+                <StatusPill status={status.text} isActive={!!status.activeLessonId} />
+              </section>
 
-              <LessonList lessons={activeLessons} />
-              {/* Note: I didn't pass activeLessonId to LessonList yet, but LessonList renders cards.
-                The LessonCard supports 'isActive' prop. 
-                I should update LessonList to accept activeLessonId prop if I want highlighting.
-                Prompt says "Lesson card styling... Subtle shadow...". 
-                It doesn't explicitly require highlighting active lesson, 
-                but "Status pill" shows status.
-                I'll stick to strict UI props from earlier.
-            */}
-            </div>
-          </div>
+              <section className="w-full animate-in slide-in-from-bottom-8 duration-700 delay-100">
+                <LessonList
+                  lessons={activeLessons}
+                  activeLessonId={status.activeLessonId}
+                  language={state.language}
+                />
+              </section>
+            </main>
+          </>
         ) : (
           <SettingsPage
             appState={state}

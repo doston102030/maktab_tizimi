@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { GeneralSettings } from './GeneralSettings';
 import { ScheduleSettings } from './ScheduleSettings';
 import { DaySelector } from '@/components/dashboard/DaySelector';
+import { DeviceSettings } from './DeviceSettings';
 import type { AppState, DayId, Lesson, ShiftId } from '@/types';
 import { addMinutes, differenceInMinutes, parse, format, isValid as isValidDate } from 'date-fns';
+import { i18n } from '@/lib/i18n';
 
 interface SettingsPageProps {
     appState: AppState;
@@ -13,10 +15,10 @@ interface SettingsPageProps {
     onBack: () => void;
 }
 
-// Fixed break duration in minutes
-const FIXED_BREAK_MINUTES = 5;
+// Break pattern: after 1st lesson (5min), 2nd (10min), 3rd (10min), 4th (5min), 5th (5min)
+const BREAKS = [5, 10, 10, 5, 5];
 
-// Helper: Recalculate lesson times preserving durations and enforcing 5min gap
+// Helper: Recalculate lesson times preserving durations and enforcing variable gaps
 const recalculateLessons = (lessons: Lesson[]): Lesson[] => {
     if (lessons.length === 0) return [];
 
@@ -26,28 +28,27 @@ const recalculateLessons = (lessons: Lesson[]): Lesson[] => {
     // Helper to format Date to "HH:mm"
     const toStr = (date: Date) => format(date, 'HH:mm');
 
-    const newLessons = [...lessons];
+    // Create a new array with new object references to avoid mutating state
+    const newLessons = lessons.map(lesson => ({ ...lesson }));
 
     // Iterate from 2nd lesson onwards
     for (let i = 0; i < newLessons.length; i++) {
-        // First lesson: Start time remains as set by user. 
-        // We only ensure EndTime is valid relative to duration.
-        // Actually, we trust the inputs for the specific lesson, BUT
-        // the user might have edited THIS lesson.
-        // We should calculate based on previous lesson if i > 0.
-
         if (i > 0) {
             const prevLesson = newLessons[i - 1];
             const prevEnd = toDate(prevLesson.endTime);
 
             if (isValidDate(prevEnd)) {
-                // Set StartTime = PrevEnd + 5min
-                const newStart = addMinutes(prevEnd, FIXED_BREAK_MINUTES);
-                newLessons[i].startTime = toStr(newStart);
+                // Determine break duration based on previous lesson index (0-based)
+                // i=1 (2nd lesson) means break after lesson index 0 (1st lesson)
+                // Break logic: 
+                // After Lesson 1 (index 0): BREAKS[0] = 5
+                // After Lesson 2 (index 1): BREAKS[1] = 10
+                // After Lesson 3 (index 2): BREAKS[2] = 10
+                // ... fallback to 5 if undefined
+                const breakDuration = BREAKS[i - 1] ?? 5;
 
-                // Recalculate EndTime based on CURRENT duration
-                // If current duration is invalid (e.g. 0 or negative), default to 45?
-                // Or just preserve the difference?
+                const newStart = addMinutes(prevEnd, breakDuration);
+                newLessons[i].startTime = toStr(newStart);
 
                 const currentStart = toDate(lessons[i].startTime);
                 const currentEnd = toDate(lessons[i].endTime);
@@ -61,10 +62,6 @@ const recalculateLessons = (lessons: Lesson[]): Lesson[] => {
                 const newEnd = addMinutes(newStart, duration);
                 newLessons[i].endTime = toStr(newEnd);
             }
-        } else {
-            // For the first lesson (i=0), we don't shift its startTime automatically 
-            // unless the user edited it directly (which is handled by the input change).
-            // However, updates to ITS duration (end time change) will trigger the chain for i=1..n
         }
     }
 
@@ -72,6 +69,8 @@ const recalculateLessons = (lessons: Lesson[]): Lesson[] => {
 };
 
 export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
+    const t = i18n[appState.language];
+
     // Local state for editing
     const [draftState, setDraftState] = useState<AppState>(appState);
 
@@ -85,7 +84,6 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
 
     // Check if current editDay has a schedule initialized
     useEffect(() => {
-        // Schedule is now strictly initialized for all days, so this check is merely for safety/fallback if state got corrupted
         if (!draftState.schedule[editDay]) {
             // Should ideally not happen with new strict types logic
         }
@@ -124,28 +122,55 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
     // Schedule Updates
     const updateLesson = (shift: ShiftId, lessonId: string, field: keyof Lesson, value: string) => {
         setDraftState(prev => {
-            const schedule = { ...prev.schedule };
-            const daySched = { ...schedule[editDay]! }; // Assumed init by effect
-            const shiftSched = { ...daySched.shifts[shift] };
+            // Deep copy structure to ensure independence
+            const newSchedule = { ...prev.schedule };
 
-            // 1. Update the specific field
-            let lessons = shiftSched.lessons.map(l => l.id === lessonId ? { ...l, [field]: value } : l);
+            // Ensure day exists
+            if (!newSchedule[editDay]) return prev;
 
-            // 2. Recalculate chain
-            lessons = recalculateLessons(lessons);
+            const newDaySched = { ...newSchedule[editDay]! };
+            const newShifts = { ...newDaySched.shifts };
+
+            // Ensure target shift is independent
+            const targetShift = { ...newShifts[shift] };
+
+            // 1. Update the specific lesson
+            let newLessons = targetShift.lessons.map(l =>
+                l.id === lessonId ? { ...l, [field]: value } : { ...l }
+            );
+
+            // Special handling: If startTime changed, preserve duration (default 45) and update endTime
+            // This allows moving the whole block by changing the first lesson's start time
+            if (field === 'startTime') {
+                const updatedLesson = newLessons.find(l => l.id === lessonId);
+                if (updatedLesson) {
+                    const now = new Date();
+                    const toDate = (t: string) => parse(t, 'HH:mm', now);
+                    const newStart = toDate(value);
+
+                    if (isValidDate(newStart)) {
+                        // Enforce 45min duration when manually changing Start Time
+                        // This prevents "invalid time" state and allows the shift to move
+                        const newEnd = addMinutes(newStart, 45);
+                        updatedLesson.endTime = format(newEnd, 'HH:mm');
+                    }
+                }
+            }
+
+            // 2. Recalculate chain (only if time changed)
+            if (field === 'startTime' || field === 'endTime') {
+                newLessons = recalculateLessons(newLessons);
+            }
+
+            // 3. Re-assemble state tree with new references
+            targetShift.lessons = newLessons;
+            newShifts[shift] = targetShift;
+            newDaySched.shifts = newShifts;
+            newSchedule[editDay] = newDaySched;
 
             return {
                 ...prev,
-                schedule: {
-                    ...prev.schedule,
-                    [editDay]: {
-                        ...daySched,
-                        shifts: {
-                            ...daySched.shifts,
-                            [shift]: { ...shiftSched, lessons }
-                        }
-                    }
-                }
+                schedule: newSchedule
             };
         });
     };
@@ -153,15 +178,17 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
     const addLesson = (shift: ShiftId) => {
         const shiftLessons = currentSchedule.shifts[shift].lessons;
 
-        let startTime = '08:00';
-        // If there are existing lessons, start 5 mins after last one
+        let startTime = shift === '1' ? '08:00' : '13:30'; // Default based on shift (13:30 for 2nd shift)
+        // If there are existing lessons, start after last one with correct break
         if (shiftLessons.length > 0) {
             const lastLesson = shiftLessons[shiftLessons.length - 1];
+            const lastIndex = shiftLessons.length - 1; // 0-based index of last lesson
             const now = new Date();
             const lastEnd = parse(lastLesson.endTime, 'HH:mm', now);
             if (isValidDate(lastEnd)) {
-                // Add 5 min fixed break
-                const newStart = addMinutes(lastEnd, FIXED_BREAK_MINUTES);
+                // Determine break based on index of the LESSON THAT JUST ENDED
+                const breakDuration = BREAKS[lastIndex] ?? 5;
+                const newStart = addMinutes(lastEnd, breakDuration);
                 startTime = format(newStart, 'HH:mm');
             }
         }
@@ -185,8 +212,6 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
 
             // Add and Recalc (just in case)
             let lessons = [...shiftSched.lessons, newLesson];
-            // No strict need to recalc whole chain if we appended correctly, but good for safety
-            // lessons = recalculateLessons(lessons); 
 
             return {
                 ...prev,
@@ -243,56 +268,97 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
     );
 
     return (
-        <div className="w-full max-w-5xl p-6 bg-background space-y-8 pb-32">
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">Sozlamalar</h1>
-                <Button variant="outline" onClick={onBack}>Orqaga</Button>
-            </div>
 
-            <section className="bg-card rounded-xl border p-6 shadow-sm">
-                <GeneralSettings
-                    schoolName={draftState.config.schoolName}
-                    onSchoolNameChange={updateSchoolName}
-                    activeDays={activeDays}
-                    onToggleDay={toggleWorkingDay}
-                    onSave={() => {
-                        handleSave();
-                        toast.success("Ish kunlari saqlandi");
-                    }}
-                />
-            </section>
-
-            <section className="space-y-6">
-                <div className="flex flex-col gap-4">
-                    {/* Day Selector for editing specific day */}
-                    <h3 className="text-lg font-medium">Jadval tahrirlash uchun kunni tanlang:</h3>
-                    <DaySelector selectedDay={editDay} onSelect={setEditDay} />
+        <div className="min-h-screen bg-background pb-32">
+            {/* Sticky Header */}
+            <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+                <div className="max-w-4xl mx-auto flex h-14 md:h-16 items-center justify-between px-4 sm:px-6">
+                    <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <span className="text-lg">⚙️</span>
+                        </div>
+                        <h1 className="text-lg md:text-xl font-bold tracking-tight">{t.settings}</h1>
+                    </div>
+                    <Button variant="ghost" onClick={onBack} className="text-muted-foreground hover:text-primary">
+                        {t.back}
+                    </Button>
                 </div>
+            </header>
 
-                <ScheduleSettings
-                    selectedDayLabel={editDay}
-                    lessonsShift1={currentSchedule.shifts['1'].lessons}
-                    lessonsShift2={currentSchedule.shifts['2'].lessons}
-                    onUpdateLesson={updateLesson}
-                    onAddLesson={addLesson}
-                    onDeleteLesson={deleteLesson}
-                />
-            </section>
+            <main className="max-w-4xl mx-auto p-3 sm:p-6 space-y-6 md:space-y-8">
+                {/* General Settings Section */}
+                <section className="bg-card rounded-2xl border shadow-sm p-4 md:p-6 transition-all hover:shadow-md">
+                    <GeneralSettings
+                        schoolName={draftState.config.schoolName}
+                        onSchoolNameChange={updateSchoolName}
+                        activeDays={activeDays}
+                        onToggleDay={toggleWorkingDay}
+                        onSave={() => {
+                            handleSave();
+                            toast.success(t.saved);
+                        }}
+                        language={appState.language}
+                    />
+                </section>
 
-            {/* Global Save */}
-            <div className="fixed bottom-0 left-0 w-full bg-background/80 backdrop-blur border-t p-4 flex justify-center z-50">
-                <Button
-                    size="lg"
-                    className="w-full max-w-md shadow-lg transition-all"
-                    onClick={() => {
-                        handleSave();
-                        toast.success("Tanaffus vaqtlari muvaffaqiyatli saqlandi");
-                    }}
-                    disabled={hasInvalidTime}
-                >
-                    {hasInvalidTime ? "Vaqtlarni to'g'rilang" : "Barcha O'zgarishlarni Saqlash"}
-                </Button>
+                {/* Schedule Editor Section */}
+                <section className="space-y-4 md:space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
+                        <div>
+                            <h3 className="text-lg font-semibold tracking-tight">{t.schedule}</h3>
+                            <p className="text-sm text-muted-foreground">
+                                {t.schedule} sozlamalari
+                            </p>
+                        </div>
+                        <div className="w-full sm:w-auto">
+                            <DaySelector selectedDay={editDay} onSelect={setEditDay} language={appState.language} />
+                        </div>
+                    </div>
+
+                    <div className="bg-card/50 rounded-2xl border shadow-sm p-2 sm:p-6 transition-all">
+                        <ScheduleSettings
+                            selectedDayLabel={editDay}
+                            lessonsShift1={currentSchedule.shifts['1'].lessons}
+                            lessonsShift2={currentSchedule.shifts['2'].lessons}
+                            onUpdateLesson={updateLesson}
+                            onAddLesson={addLesson}
+                            onDeleteLesson={deleteLesson}
+                            language={appState.language}
+                        />
+                    </div>
+                </section>
+
+                {/* Device Settings Section */}
+                <section className="bg-gradient-to-br from-card to-secondary/30 rounded-2xl border shadow-sm p-4 md:p-6">
+                    <DeviceSettings appState={draftState} selectedDay={editDay} language={appState.language} />
+                </section>
+            </main>
+
+            {/* Floating Save Bar */}
+            <div className="fixed bottom-6 left-0 right-0 px-4 flex justify-center z-50 pointer-events-none">
+                <div className="bg-background/80 backdrop-blur-lg border shadow-xl rounded-full p-2 pr-6 pl-6 flex items-center gap-4 pointer-events-auto max-w-md w-full animate-in slide-in-from-bottom-6 duration-500">
+                    <span className="text-sm font-medium text-muted-foreground hidden sm:inline-block flex-1">
+                        {hasInvalidTime ? t.timeError : "O'zgarishlarni saqlashni unutmang"}
+                    </span>
+                    <Button
+                        size="lg"
+                        className={`rounded-full px-8 font-semibold shadow-lg transition-all ${hasInvalidTime ? 'bg-destructive hover:bg-destructive/90' : 'bg-primary hover:bg-primary/90'
+                            }`}
+                        onClick={() => {
+                            handleSave();
+                            toast.success(t.saved);
+                        }}
+                        disabled={hasInvalidTime}
+                    >
+                        {hasInvalidTime ? t.timeError : t.save}
+                    </Button>
+                </div>
             </div>
         </div>
     );
 }
+
+
+
+
+

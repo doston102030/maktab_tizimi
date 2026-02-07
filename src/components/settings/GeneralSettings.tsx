@@ -1,50 +1,52 @@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { DayId } from '@/types';
-
-// Short names for toggles as requested: "Yak, Dush, Sesh, Chor, Pay, Jum, Shan"
-// Mapping to DayId
-const SHORT_DAYS = [
-    { id: 'Yakshanba', label: 'Yak' },
-    { id: 'Dushanba', label: 'Dush' },
-    { id: 'Seshanba', label: 'Sesh' },
-    { id: 'Chorshanba', label: 'Chor' },
-    { id: 'Payshanba', label: 'Pay' },
-    { id: 'Juma', label: 'Jum' },
-    { id: 'Shanba', label: 'Shan' },
-] as const;
+import type { DayId, Language } from '@/types';
+import { i18n } from '@/lib/i18n';
 
 interface GeneralSettingsProps {
     schoolName: string;
     onSchoolNameChange: (val: string) => void;
-    activeDays: DayId[]; // List of active days
-    onToggleDay: (day: string) => void; // Using string to allow Yakshanba if needed
+    activeDays: DayId[];
+    onToggleDay: (day: string) => void;
     onSave: () => void;
+    language: Language;
 }
 
-export function GeneralSettings({ schoolName, onSchoolNameChange, activeDays, onToggleDay, onSave }: GeneralSettingsProps) {
+export function GeneralSettings({ schoolName, onSchoolNameChange, activeDays, onToggleDay, onSave, language }: GeneralSettingsProps) {
+    const t = i18n[language];
+
+    // Short names for toggles
+    const SHORT_DAYS = [
+        { id: 'Dushanba', label: language === 'UZ' ? 'Du' : language === 'RU' ? 'Пн' : 'Mo' },
+        { id: 'Seshanba', label: language === 'UZ' ? 'Se' : language === 'RU' ? 'Вт' : 'Tu' },
+        { id: 'Chorshanba', label: language === 'UZ' ? 'Chor' : language === 'RU' ? 'Ср' : 'We' },
+        { id: 'Payshanba', label: language === 'UZ' ? 'Pay' : language === 'RU' ? 'Чт' : 'Th' },
+        { id: 'Juma', label: language === 'UZ' ? 'Ju' : language === 'RU' ? 'Пт' : 'Fr' },
+        { id: 'Shanba', label: language === 'UZ' ? 'Sha' : language === 'RU' ? 'Сб' : 'Sa' },
+    ] as const;
+
     return (
-        <div className="space-y-6">
-            <h2 className="text-xl font-bold">Umumiy Sozlamalar</h2>
+        <div className="space-y-4 md:space-y-6">
+            <h2 className="text-lg md:text-xl font-bold mb-4">{t.settings}</h2>
 
             <div className="space-y-4">
                 {/* Input */}
                 <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium">Maktab Nomi</label>
+                    <label className="text-sm font-medium text-muted-foreground">{t.schoolName}</label>
                     <Input
                         value={schoolName}
                         onChange={(e) => onSchoolNameChange(e.target.value)}
-                        placeholder="Maktab nomini kiriting"
-                        className="max-w-md"
+                        placeholder="School Name"
+                        className="max-w-md h-10 md:h-11 text-base"
                     />
                 </div>
 
                 {/* Working Days Card */}
-                <div className="bg-card rounded-xl border p-4 md:p-6 shadow-sm flex flex-col gap-6 relative">
-                    <div className="flex flex-col gap-4">
-                        <label className="text-base font-semibold">Ish kunlari</label>
-                        <div className="flex flex-wrap gap-2 md:gap-3">
+                <div className="flex flex-col gap-4 relative pt-4 md:pt-6 border-t border-border/50">
+                    <div className="flex flex-col gap-3">
+                        <label className="text-base font-semibold">{t.workingDays}</label>
+                        <div className="flex flex-wrap gap-2">
                             {SHORT_DAYS.map((day) => {
                                 const isActive = activeDays.includes(day.id as DayId);
                                 return (
@@ -52,10 +54,10 @@ export function GeneralSettings({ schoolName, onSchoolNameChange, activeDays, on
                                         key={day.id}
                                         onClick={() => onToggleDay(day.id)}
                                         className={cn(
-                                            "flex-1 min-w-[3.5rem] md:min-w-[4rem] h-10 md:h-12 flex items-center justify-center rounded-lg text-sm font-medium transition-all shadow-sm border",
+                                            "flex-1 min-w-[3rem] h-10 md:h-11 flex items-center justify-center rounded-lg text-sm font-medium transition-all shadow-sm border select-none",
                                             isActive
-                                                ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700 ring-2 ring-blue-600/20"
-                                                : "bg-secondary text-secondary-foreground border-transparent hover:bg-secondary/80"
+                                                ? "bg-primary text-primary-foreground border-primary shadow-md scale-105 font-bold"
+                                                : "bg-secondary/50 text-muted-foreground border-transparent hover:bg-secondary hover:text-foreground"
                                         )}
                                     >
                                         {day.label}
@@ -66,12 +68,12 @@ export function GeneralSettings({ schoolName, onSchoolNameChange, activeDays, on
                     </div>
 
                     {/* Save Button */}
-                    <div className="flex justify-end pt-2 border-t border-border/50">
+                    <div className="flex justify-end pt-4 border-t border-border/50">
                         <Button
                             onClick={onSave}
-                            className="bg-green-600 hover:bg-green-700 text-white px-8 py-2 md:text-lg h-auto shadow-md"
+                            className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto font-semibold px-8 h-10 md:h-11 text-base shadow-sm"
                         >
-                            Saqlash
+                            {t.save}
                         </Button>
                     </div>
                 </div>
