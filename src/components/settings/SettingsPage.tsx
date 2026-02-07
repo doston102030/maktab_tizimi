@@ -337,7 +337,7 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
             {/* Floating Save Bar */}
             <div className="fixed bottom-6 left-0 right-0 px-4 flex justify-center z-50 pointer-events-none">
                 <div className="bg-background/80 backdrop-blur-lg border shadow-xl rounded-full p-2 pr-6 pl-6 flex items-center gap-4 pointer-events-auto max-w-md w-full animate-in slide-in-from-bottom-6 duration-500">
-                    <span className="text-sm font-medium text-muted-foreground hidden sm:inline-block flex-1">
+                    <span className="text-sm font-medium text-muted-foreground flex-1 truncate">
                         {hasInvalidTime ? t.timeError : "O'zgarishlarni saqlashni unutmang"}
                     </span>
                     <Button

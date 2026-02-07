@@ -88,8 +88,12 @@ class BellService {
         });
     }
 
-    async testBell(): Promise<void> {
-        await this.request('/api/test', { method: 'POST' });
+    async testBell(durationSec: number = 5): Promise<void> {
+        await this.request('/api/test', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ duration: durationSec })
+        });
     }
 }
 

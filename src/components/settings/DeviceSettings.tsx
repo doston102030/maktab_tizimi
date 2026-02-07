@@ -17,6 +17,7 @@ interface DeviceSettingsProps {
 export function DeviceSettings({ appState, selectedDay, language }: DeviceSettingsProps) {
     const t = i18n[language];
     const [ip, setIp] = useState('192.168.4.1');
+    const [testDuration, setTestDuration] = useState('5');
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState<'disconnected' | 'connected'>('disconnected');
 
@@ -38,9 +39,10 @@ export function DeviceSettings({ appState, selectedDay, language }: DeviceSettin
     };
 
     const handleTestBell = async () => {
+        const duration = parseInt(testDuration) || 5;
         try {
-            await bellService.testBell();
-            toast.success("Bell signal yuborildi");
+            await bellService.testBell(duration);
+            toast.success(`Bell signal yuborildi (${duration}s)`);
         } catch (e) {
             toast.error("Xatolik yuz berdi");
         }
@@ -115,14 +117,14 @@ export function DeviceSettings({ appState, selectedDay, language }: DeviceSettin
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className={cn("p-2 rounded-lg bg-background/50 border shadow-sm", status === 'connected' ? "text-green-600" : "text-muted-foreground")}>
+                    <div className={cn("p-2 rounded-lg bg-background/50 border shadow-sm", status === 'connected' ? "text-green-600" : "text-destructive")}>
                         <Wifi size={24} />
                     </div>
                     <div>
                         <h3 className="text-lg font-semibold tracking-tight">{t.deviceSettings}</h3>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <span>Status:</span>
-                            <span className={cn("font-medium flex items-center gap-1.5", status === 'connected' ? "text-green-600" : "text-muted-foreground")}>
+                            <span className={cn("font-medium flex items-center gap-1.5", status === 'connected' ? "text-green-600" : "text-destructive")}>
                                 {status === 'connected' ? (
                                     <><CheckCircle2 size={14} /> {t.connected}</>
                                 ) : (
@@ -157,24 +159,35 @@ export function DeviceSettings({ appState, selectedDay, language }: DeviceSettin
             </div>
 
             {/* Manual Test Card - Always Visible */}
-            <div className="bg-orange-500/10 border-orange-500/20 border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="bg-orange-500/10 border-orange-500/20 border rounded-xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-orange-500/20 text-orange-600 rounded-lg">
                         <Bell size={24} />
                     </div>
                     <div>
                         <h4 className="font-semibold text-orange-700 dark:text-orange-400">Sinov (Test)</h4>
-                        <p className="text-xs text-muted-foreground">Qo'ng'iroqni tekshirish uchun bosing</p>
+                        <p className="text-xs text-muted-foreground">Qo'ng'iroqni tekshirish</p>
                     </div>
                 </div>
-                <Button
-                    onClick={handleTestBell}
-                    variant="outline"
-                    className="w-full sm:w-auto border-orange-500/30 hover:bg-orange-500/20 hover:text-orange-700 dark:hover:text-orange-400"
-                >
-                    <Bell className="mr-2 h-4 w-4" />
-                    {t.testBell}
-                </Button>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <Input
+                        type="number"
+                        min="1"
+                        max="60"
+                        value={testDuration}
+                        onChange={(e) => setTestDuration(e.target.value)}
+                        className="w-20 bg-background/50 border-orange-500/30 focus-visible:ring-orange-500"
+                        placeholder="Sekund"
+                    />
+                    <Button
+                        onClick={handleTestBell}
+                        variant="outline"
+                        className="flex-1 sm:flex-none border-orange-500/30 hover:bg-orange-500/20 hover:text-orange-700 dark:hover:text-orange-400"
+                    >
+                        <Bell className="mr-2 h-4 w-4" />
+                        {t.testBell}
+                    </Button>
+                </div>
             </div>
 
             {/* Connected Actions */}
