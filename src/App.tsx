@@ -12,6 +12,19 @@ import { parse, isWithinInterval, format } from 'date-fns';
 import { i18n } from '@/lib/i18n';
 
 import { INITIAL_STATE } from '@/initialState';
+import type { DayId } from '@/types';
+
+const DAYS: DayId[] = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'];
+
+function getCurrentDayId(): DayId {
+  const dayIndex = new Date().getDay(); // 0 = Yakshanba (Sunday)
+  if (dayIndex === 0) return 'Dushanba'; // Sunday -> Show Monday
+  // dayIndex 1=Mon ... 6=Sat.
+  // Our array is 0=Mon ... 5=Sat.
+  // So: index 1 -> array[0], index 6 -> array[5].
+  const mappedIndex = dayIndex - 1;
+  return DAYS[mappedIndex] || 'Dushanba';
+}
 
 function App() {
   // Auth State
@@ -28,7 +41,12 @@ function App() {
   // Load from local storage or use initial
   const [state, setState] = useState<AppState>(() => {
     const saved = localStorage.getItem('bell_app_state');
-    return saved ? JSON.parse(saved) : INITIAL_STATE;
+    const parsed = saved ? JSON.parse(saved) : INITIAL_STATE;
+    // Always override selectedDay with current day on boot
+    return {
+      ...parsed,
+      selectedDay: getCurrentDayId()
+    };
   });
 
   const [currentView, setCurrentView] = useState<'dashboard' | 'settings'>('dashboard');

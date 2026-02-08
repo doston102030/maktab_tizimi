@@ -1,13 +1,15 @@
-#include <WiFi.h>
-#include <WebServer.h>
-#include <Preferences.h>
 #include <ArduinoJson.h>
+#include <Preferences.h>
+#include <RTClib.h>
+#include <WebServer.h>
+#include <WiFi.h>
+#include <Wire.h>
 #include <time.h>
 
 // ======== USER SETTINGS ========
 static const int OUTPUT_PIN = 2; // Change if your LED is on another GPIO
-static const char* AP_SSID = "ElektronBell";
-static const char* AP_PASS = "12345678"; // 8+ chars or empty for open
+static const char *AP_SSID = "ElektronBell";
+static const char *AP_PASS = "12345678"; // 8+ chars or empty for open
 
 // Default timezone offset (UTC+05:00)
 static const int TZ_DEFAULT_MINUTES = 300;
@@ -15,6 +17,7 @@ static const int TZ_DEFAULT_MINUTES = 300;
 // ======== GLOBALS ========
 WebServer server(80);
 Preferences prefs;
+RTC_DS3231 rtc;
 
 static const size_t CONFIG_DOC_SIZE = 12288;
 DynamicJsonDocument configDoc(CONFIG_DOC_SIZE);
@@ -25,7 +28,7 @@ unsigned long bellActiveUntilMs = 0;
 int tzOffsetMinutes = TZ_DEFAULT_MINUTES;
 
 // ======== DEFAULT CONFIG ========
-const char* DEFAULT_CONFIG_JSON = R"json(
+const char *DEFAULT_CONFIG_JSON = R"json(
 {
   "bellDurationSec": 5,
   "activeDays": [true,true,true,true,true,true,false],
@@ -229,7 +232,26 @@ const char INDEX_HTML[] PROGMEM = R"html(
 const $ = (id) => document.getElementById(id);
 
 function linesToArray(text) {
-  return text.split(/\r?\n/).map(s => s.trim()).filter(s => s.length > 0);
+  return text.split(/\r?\n/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0)
+    .map(s => {
+      // Normalize H:MM to HH:MM
+      if (s.includes(':')) {
+        const p = s.split(':');
+        if (p.length === 2) {
+          return p[0].padStart(2, '0') + ':' + p[1].padStart(2, '0');
+        }
+      }
+      // Normalize YYYY-M-D to YYYY-MM-DD
+      if (s.includes('-')) {
+        const d = s.split('-');
+        if (d.length === 3) {
+          return d[0] + '-' + d[1].padStart(2, '0') + '-' + d[2].padStart(2, '0');
+        }
+      }
+      return s;
+    });
 }
 
 function arrayToLines(arr) {
@@ -322,36 +344,41 @@ bool loadConfigDoc() {
   return true;
 }
 
-bool saveConfigJson(const String& json) {
+bool saveConfigJson(const String &json) {
   DeserializationError err = deserializeJson(configDoc, json);
-  if (err) return false;
+  if (err)
+    return false;
   prefs.putString("config", json);
   return true;
 }
 
-bool isHoliday(const String& dateStr) {
+bool isHoliday(const String &dateStr) {
   JsonArray arr = configDoc["holidays"].as<JsonArray>();
   for (JsonVariant v : arr) {
-    if (v.is<const char*>()) {
-      if (dateStr == String(v.as<const char*>())) return true;
+    if (v.is<const char *>()) {
+      if (dateStr == String(v.as<const char *>()))
+        return true;
     }
   }
   return false;
 }
 
-bool timeInArray(const String& hhmm, JsonArray arr) {
-  if (arr.isNull()) return false;
+bool timeInArray(const String &hhmm, JsonArray arr) {
+  if (arr.isNull())
+    return false;
   for (JsonVariant v : arr) {
-    if (v.is<const char*>()) {
-      if (hhmm == String(v.as<const char*>())) return true;
+    if (v.is<const char *>()) {
+      if (hhmm == String(v.as<const char *>()))
+        return true;
     }
   }
   return false;
 }
 
-bool getLocalTm(struct tm* outTm, String* outDate, String* outTime) {
+bool getLocalTm(struct tm *outTm, String *outDate, String *outTime) {
   time_t nowUtc = time(nullptr);
-  if (nowUtc < 100000) return false; // time not set
+  if (nowUtc < 100000)
+    return false; // time not set
   time_t local = nowUtc + (tzOffsetMinutes * 60);
   gmtime_r(&local, outTm);
 
@@ -359,30 +386,33 @@ bool getLocalTm(struct tm* outTm, String* outDate, String* outTime) {
   char timeBuf[6];
   strftime(dateBuf, sizeof(dateBuf), "%Y-%m-%d", outTm);
   strftime(timeBuf, sizeof(timeBuf), "%H:%M", outTm);
-  if (outDate) *outDate = String(dateBuf);
-  if (outTime) *outTime = String(timeBuf);
+  if (outDate)
+    *outDate = String(dateBuf);
+  if (outTime)
+    *outTime = String(timeBuf);
   return true;
 }
 
-void setBellState(bool on) {
-  digitalWrite(OUTPUT_PIN, on ? HIGH : LOW);
-}
+void setBellState(bool on) { digitalWrite(OUTPUT_PIN, on ? HIGH : LOW); }
 
 void triggerBell() {
   int duration = configDoc["bellDurationSec"].as<int>();
-  if (duration <= 0) duration = 5;
+  if (duration <= 0)
+    duration = 5;
   setBellState(true);
   bellActiveUntilMs = millis() + (unsigned long)duration * 1000UL;
 }
 
 void scheduleLoop() {
-  if (!timeIsSet) return;
+  if (!timeIsSet)
+    return;
 
   struct tm t;
   String dateStr, timeStr;
-  if (!getLocalTm(&t, &dateStr, &timeStr)) return;
+  if (!getLocalTm(&t, &dateStr, &timeStr))
+    return;
 
-  int wday = t.tm_wday; // 0=Sunday
+  int wday = t.tm_wday;                        // 0=Sunday
   int dayIndex = (wday == 0) ? 6 : (wday - 1); // 0=Mon
 
   JsonArray days = configDoc["activeDays"].as<JsonArray>();
@@ -391,27 +421,30 @@ void scheduleLoop() {
     active = days[dayIndex].as<bool>();
   }
 
-  if (!active) return;
-  if (isHoliday(dateStr)) return;
+  if (!active)
+    return;
+  if (isHoliday(dateStr))
+    return;
 
   JsonArray s1 = configDoc["shift1"]["times"].as<JsonArray>();
   JsonArray s2 = configDoc["shift2"]["times"].as<JsonArray>();
   JsonArray sc = configDoc["customTimes"].as<JsonArray>();
 
-  bool match = timeInArray(timeStr, s1) || timeInArray(timeStr, s2) || timeInArray(timeStr, sc);
-  if (!match) return;
+  bool match = timeInArray(timeStr, s1) || timeInArray(timeStr, s2) ||
+               timeInArray(timeStr, sc);
+  if (!match)
+    return;
 
   String key = dateStr + " " + timeStr;
-  if (key == lastBellKey) return;
+  if (key == lastBellKey)
+    return;
 
   lastBellKey = key;
   triggerBell();
 }
 
 // ======== WEB HANDLERS ========
-void handleRoot() {
-  server.send_P(200, "text/html", INDEX_HTML);
-}
+void handleRoot() { server.send_P(200, "text/html", INDEX_HTML); }
 
 void handleGetConfig() {
   String json = getConfigJson();
@@ -443,6 +476,11 @@ void handlePostTime() {
     return;
   }
   time_t epoch = (time_t)doc["epoch"].as<long>();
+
+  // Update RTC if present
+  rtc.adjust(DateTime(epoch));
+
+  // Update System Time
   if (doc["tzOffsetMinutes"].is<int>()) {
     tzOffsetMinutes = doc["tzOffsetMinutes"].as<int>();
     prefs.putInt("tz", tzOffsetMinutes);
@@ -451,6 +489,7 @@ void handlePostTime() {
   tv.tv_sec = epoch;
   tv.tv_usec = 0;
   settimeofday(&tv, nullptr);
+  rtc.adjust(DateTime(epoch));
   timeIsSet = true;
   server.send(200, "text/plain", "OK");
 }
@@ -481,12 +520,32 @@ void handlePostTest() {
 
 // ======== SETUP/LOOP ========
 void setup() {
+  Serial.begin(115200);
   pinMode(OUTPUT_PIN, OUTPUT);
   setBellState(false);
 
   prefs.begin("ebell", false);
   tzOffsetMinutes = prefs.getInt("tz", TZ_DEFAULT_MINUTES);
   loadConfigDoc();
+
+  // Initialize I2C and RTC
+  Wire.begin();
+  if (!rtc.begin()) {
+    Serial.println("RTC not found!");
+  } else {
+    // If RTC works, sync time
+    if (rtc.lostPower()) {
+      Serial.println("RTC lost power, please set time!");
+    } else {
+      DateTime now = rtc.now();
+      struct timeval tv;
+      tv.tv_sec = now.unixtime();
+      tv.tv_usec = 0;
+      settimeofday(&tv, nullptr);
+      timeIsSet = true;
+      Serial.println("Time synced from RTC: " + String(now.unixtime()));
+    }
+  }
 
   WiFi.mode(WIFI_AP);
   WiFi.softAP(AP_SSID, AP_PASS);
@@ -507,7 +566,8 @@ void loop() {
   // Update time flag once it is set
   if (!timeIsSet) {
     time_t nowUtc = time(nullptr);
-    if (nowUtc > 100000) timeIsSet = true;
+    if (nowUtc > 100000)
+      timeIsSet = true;
   }
 
   scheduleLoop();
