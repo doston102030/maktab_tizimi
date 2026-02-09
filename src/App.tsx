@@ -53,8 +53,23 @@ function App() {
   const [now, setNow] = useState(new Date());
 
   // Timer for logic updates (every second)
+  // Timer for logic updates (every second)
   useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000);
+    const timer = setInterval(() => {
+      setNow(new Date());
+
+      // Auto-update selected day if it changes (e.g. midnight crossover)
+      // Only do this if user hasn't explicitly locked it? 
+      // For this app, let's keep it synced to real-time for "Live" feel as requested.
+      // Or at least update it if it drifts.
+      const currentRealDay = getCurrentDayId();
+      setState(prev => {
+        if (prev.selectedDay !== currentRealDay) {
+          return { ...prev, selectedDay: currentRealDay };
+        }
+        return prev;
+      });
+    }, 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -122,8 +137,21 @@ function App() {
   const status = getStatus();
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center transition-colors duration-300">
-      <Toaster position="top-right" />
+    <div className="min-h-screen bg-transparent text-foreground flex flex-col items-center relative overflow-hidden transition-colors duration-500">
+      <Toaster position="top-right" toastOptions={{
+        style: {
+          background: 'hsl(var(--card))',
+          color: 'hsl(var(--foreground))',
+          border: '1px solid hsl(var(--border))',
+        },
+      }} />
+
+      {/* Dynamic Background Blobs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+        <div className="absolute top-0 left-1/4 w-72 h-72 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+        <div className="absolute top-0 right-1/4 w-72 h-72 bg-indigo-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-32 left-1/3 w-72 h-72 bg-purple-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+      </div>
 
       {!isAuthenticated ? (
         <LoginPage onLogin={handleLoginSuccess} />
@@ -140,8 +168,8 @@ function App() {
               onSettingsClick={() => setCurrentView('settings')}
             />
 
-            <main className="w-full max-w-4xl px-4 pb-20 space-y-8 flex flex-col items-center mt-6">
-              <section className="w-full">
+            <main className="w-full max-w-5xl px-3 sm:px-6 pb-24 space-y-6 md:space-y-12 flex flex-col items-center mt-4 md:mt-10 z-10">
+              <section className="w-full animate-in slide-in-from-top-4 duration-700 fade-in">
                 <DaySelector
                   selectedDay={state.selectedDay}
                   onSelect={(day) => setState(prev => ({ ...prev, selectedDay: day }))}
@@ -149,17 +177,19 @@ function App() {
                 />
               </section>
 
-              <section className="flex flex-col items-center gap-6 w-full animate-in slide-in-from-bottom-4 duration-500">
+              <section className="flex flex-col items-center gap-8 w-full animate-in slide-in-from-bottom-6 duration-700 delay-100 fade-in fill-mode-backwards">
                 <ShiftSelector
                   selectedShift={state.selectedShift}
                   onSelect={(shift) => setState(prev => ({ ...prev, selectedShift: shift }))}
                   language={state.language}
                 />
 
-                <StatusPill status={status.text} isActive={!!status.activeLessonId} />
+                <div className="w-full flex justify-center scale-110 active:scale-105 transition-transform duration-300">
+                  <StatusPill status={status.text} isActive={!!status.activeLessonId} />
+                </div>
               </section>
 
-              <section className="w-full animate-in slide-in-from-bottom-8 duration-700 delay-100">
+              <section className="w-full animate-in slide-in-from-bottom-12 duration-1000 delay-200 fade-in fill-mode-backwards">
                 <LessonList
                   lessons={activeLessons}
                   activeLessonId={status.activeLessonId}

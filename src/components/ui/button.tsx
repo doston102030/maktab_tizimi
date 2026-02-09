@@ -8,11 +8,11 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: "bg-primary text-primary-foreground hover:bg-primary/90",
-                destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-                outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-                secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-                ghost: "hover:bg-accent hover:text-accent-foreground",
+                default: "bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 text-white shadow-[0_0_20px_-5px_rgba(79,70,229,0.5)] hover:shadow-[0_0_30px_-5px_rgba(79,70,229,0.8)] hover:scale-110 active:scale-95 transition-all duration-300 border-0 ring-1 ring-white/20 animate-shimmer font-bold tracking-wide",
+                destructive: "bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-[0_0_20px_-5px_rgba(225,29,72,0.5)] hover:shadow-[0_0_25px_-5px_rgba(225,29,72,0.7)] hover:scale-105",
+                outline: "border-2 border-primary/50 bg-background/50 backdrop-blur-md shadow-sm hover:bg-primary hover:text-white hover:border-primary hover:shadow-[0_0_20px_-5px_rgba(79,70,229,0.5)] transition-all duration-300",
+                secondary: "bg-white/80 dark:bg-black/50 text-foreground hover:bg-white dark:hover:bg-black/80 backdrop-blur-md border border-white/20 shadow-md hover:scale-105 transition-all",
+                ghost: "hover:bg-primary/10 hover:text-primary transition-colors hover:scale-105",
                 link: "text-primary underline-offset-4 hover:underline",
             },
             size: {

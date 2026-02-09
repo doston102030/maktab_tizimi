@@ -17,13 +17,16 @@ interface DeviceSettingsProps {
 export function DeviceSettings({ appState, selectedDay, language }: DeviceSettingsProps) {
     const t = i18n[language];
     const [ip, setIp] = useState('192.168.4.1');
+    const [useProxy, setUseProxy] = useState(false);
+    const [bellDuration, setBellDuration] = useState('5');
     const [testDuration, setTestDuration] = useState('5');
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState<'disconnected' | 'connected'>('disconnected');
 
     const handleConnect = async () => {
         setLoading(true);
-        bellService.setBaseUrl(`http://${ip}`);
+        const baseUrl = useProxy ? '' : `http://${ip}`;
+        bellService.setBaseUrl(baseUrl);
         try {
             const time = await bellService.getTime();
             if (time) {
@@ -70,6 +73,7 @@ export function DeviceSettings({ appState, selectedDay, language }: DeviceSettin
         const getTimes = (lessons: Lesson[]) => {
             const times: string[] = [];
             lessons.forEach(l => {
+                if (l.isActive === false) return; // Skip inactive lessons
                 if (l.startTime) times.push(l.startTime);
                 if (l.endTime) times.push(l.endTime);
             });
@@ -89,7 +93,7 @@ export function DeviceSettings({ appState, selectedDay, language }: DeviceSettin
         });
 
         const config: BellConfig = {
-            bellDurationSec: 5,
+            bellDurationSec: parseInt(bellDuration) || 5,
             activeDays: activeDaysBool,
             shift1: {
                 start: s1.length > 0 ? s1[0].startTime : "08:00",
@@ -138,13 +142,24 @@ export function DeviceSettings({ appState, selectedDay, language }: DeviceSettin
 
             <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end bg-background/40 p-4 rounded-xl border border-dashed">
                 <div className="flex-1 space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">IP Manzil</label>
+                    <div className="flex justify-between items-center">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">IP Manzil</label>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setUseProxy(!useProxy)}
+                            className={cn("h-5 text-[10px] px-2", useProxy ? "text-green-600 bg-green-500/10" : "text-muted-foreground")}
+                        >
+                            {useProxy ? "Proxy: YONIQ" : "Proxy: O'CHIQ"}
+                        </Button>
+                    </div>
                     <div className="relative">
                         <Input
                             value={ip}
                             onChange={e => setIp(e.target.value)}
                             placeholder="192.168.4.1"
-                            className="pl-9 font-mono bg-background/80 focus-visible:ring-offset-0"
+                            disabled={useProxy}
+                            className={cn("pl-9 font-mono bg-background/80 focus-visible:ring-offset-0", useProxy && "opacity-50")}
                         />
                         <Wifi className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                     </div>
@@ -156,6 +171,37 @@ export function DeviceSettings({ appState, selectedDay, language }: DeviceSettin
                 >
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (status === 'connected' ? t.connected : t.connect)}
                 </Button>
+            </div>
+
+            {!useProxy && status === 'disconnected' && (
+                <div className="text-[11px] text-muted-foreground text-center -mt-4 bg-muted/40 p-2 rounded-lg">
+                    Agarda ulanmasa, yuqoridagi <b>Proxy</b> ni yoqib ko'ring
+                </div>
+            )}
+
+            {/* Duration Settings */}
+            <div className="bg-blue-500/10 border-blue-500/20 border rounded-xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-500/20 text-blue-600 rounded-lg">
+                        <Clock size={24} />
+                    </div>
+                    <div>
+                        <h4 className="font-semibold text-blue-700 dark:text-blue-400">Qo'ng'iroq Davomiyligi</h4>
+                        <p className="text-xs text-muted-foreground">Jadval uchun signal vaqti</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <Input
+                        type="number"
+                        min="1"
+                        max="60"
+                        value={bellDuration}
+                        onChange={(e) => setBellDuration(e.target.value)}
+                        className="w-20 bg-background/50 border-blue-500/30 focus-visible:ring-blue-500"
+                        placeholder="Sekund"
+                    />
+                    <span className="text-sm font-medium text-blue-700 dark:text-blue-400">sekund</span>
+                </div>
             </div>
 
             {/* Manual Test Card - Always Visible */}

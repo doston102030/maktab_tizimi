@@ -106,3 +106,11 @@ export const i18n = {
 export const getTranslation = (lang: Language, key: keyof typeof i18n['UZ']) => {
     return i18n[lang][key] || i18n['UZ'][key];
 };
+
+import { uz, ru, enUS } from 'date-fns/locale';
+
+export const LOCALE_MAP = {
+    'UZ': uz,
+    'RU': ru,
+    'EN': enUS
+};

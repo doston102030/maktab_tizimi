@@ -9,6 +9,7 @@ export interface Lesson {
     startTime: string; // "08:00"
     endTime: string; // "08:45"
     breakMinutes?: string; // Optional break duration (minutes)
+    isActive?: boolean; // If false, bell won't ring
 }
 
 export interface ShiftSchedule {

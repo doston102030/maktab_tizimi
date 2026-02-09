@@ -58,6 +58,9 @@ class BellService {
             return res.text() as unknown as T;
         } catch (error) {
             console.error(`BellService Error (${endpoint}):`, error);
+            if (error instanceof TypeError && error.message === 'Failed to fetch') {
+                throw new Error("Qurilma bilan aloqa yo'q (Network/CORS). IP manzilni tekshiring yoki qurilma o'chig'ligini ko'ring.");
+            }
             throw error;
         }
     }

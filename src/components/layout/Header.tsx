@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Moon, Sun, Settings, BellRing } from 'lucide-react';
+import { SunMedium, MoonStar, SlidersHorizontal, Atom, Globe } from 'lucide-react';
 import type { Language, Theme } from '@/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { uz, ru, enUS } from 'date-fns/locale';
+import { LOCALE_MAP } from '@/lib/i18n';
 
 interface HeaderProps {
     schoolName: string;
@@ -15,93 +15,115 @@ interface HeaderProps {
     onSettingsClick: () => void;
 }
 
-const LOCALE_MAP = {
-    'UZ': uz,
-    'RU': ru,
-    'EN': enUS
-};
-
 export function Header({ schoolName, subtitle, theme, toggleTheme, language, setLanguage, onSettingsClick }: HeaderProps) {
     const [time, setTime] = useState(new Date());
+    const [isLangOpen, setIsLangOpen] = useState(false);
 
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
 
-    const dateStr = format(time, "d MMMM, yyyy", { locale: LOCALE_MAP[language] });
     const dayName = format(time, "EEEE", { locale: LOCALE_MAP[language] });
 
+    const timeString = format(time, 'HH:mm:ss');
+    const dateString = format(time, "d MMMM, yyyy", { locale: LOCALE_MAP[language] });
+
     return (
-        <header className="sticky top-0 z-50 w-full px-4 py-3 md:py-4 flex flex-col md:flex-row items-center justify-between gap-4 bg-background/60 backdrop-blur-xl border-b shadow-sm transition-all duration-300">
+        <header className="sticky top-2 z-50 w-full max-w-5xl mx-auto px-4 py-2 flex flex-col md:flex-row items-center justify-between gap-2 glass rounded-full mt-2 transition-all duration-500 border-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] animate-in slide-in-from-top-4 hover:scale-[1.01] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.5)]">
             {/* Left: School Info */}
-            <div className="flex items-center gap-3 w-full md:w-auto">
-                <div className="bg-primary/10 p-2 rounded-xl text-primary hidden md:block">
-                    <BellRing size={24} />
+            <div className="flex items-center gap-3 w-full md:w-auto pl-2">
+                <div className="bg-gradient-to-br from-primary to-blue-600 p-2 rounded-full text-white shadow-lg shadow-blue-500/30 hidden md:block animate-spin-slow">
+                    <Atom size={22} className="text-white" />
                 </div>
-                <div className="flex flex-col">
-                    <h1 className="text-lg md:text-xl font-bold leading-none tracking-tight text-foreground/90">{schoolName}</h1>
-                    <p className="text-xs md:text-sm text-muted-foreground font-medium">{subtitle}</p>
+                <div>
+                    <h1 className="text-xl md:text-2xl font-black tracking-tight text-gradient drop-shadow-sm leading-tight">
+                        {schoolName}
+                    </h1>
+                    {subtitle && (
+                        <p className="text-xs font-semibold text-muted-foreground/80 tracking-wide uppercase hidden sm:block">
+                            {subtitle}
+                        </p>
+                    )}
                 </div>
-                {/* Mobile Settings Trigger */}
-                <button onClick={onSettingsClick} className="ml-auto p-2 md:hidden text-muted-foreground hover:text-foreground">
-                    <Settings size={20} />
-                </button>
             </div>
 
-            {/* Center: Clock Display */}
-            <div className="flex flex-col items-center">
-                <span className="text-4xl md:text-5xl font-mono font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600 drop-shadow-sm tabular-nums leading-none pb-1">
-                    {format(time, 'HH:mm:ss')}
-                </span>
-                <span className="text-sm md:text-base font-medium text-muted-foreground capitalize">
-                    {dayName}, {dateStr}
-                </span>
+            {/* Center: Clock */}
+            <div className="flex flex-col items-center justify-center -my-1">
+                <div className="text-3xl md:text-4xl font-black tabular-nums tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-foreground to-foreground/50 drop-shadow-2xl font-mono">
+                    {timeString}
+                </div>
+                <div className="text-[10px] md:text-xs font-bold text-primary/80 uppercase tracking-[0.2em] bg-primary/5 px-3 py-0.5 rounded-full border border-primary/10">
+                    {dayName} • {dateString}
+                </div>
             </div>
 
-            {/* Right: Controls (Hidden on mobile mostly, except theme) */}
+            {/* Right: Controls */}
             <div className="hidden md:flex items-center gap-3">
                 <button
                     onClick={toggleTheme}
-                    className="p-2.5 rounded-full bg-secondary/50 hover:bg-secondary text-foreground transition-all hover:scale-105 active:scale-95"
+                    className="p-3 rounded-full bg-secondary/30 hover:bg-secondary text-foreground border border-transparent hover:border-border transition-all hover:scale-110 active:scale-95 shadow-sm group"
                     title={theme === 'dark' ? "Yorug' rejim" : "Tungi rejim"}
                 >
-                    {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                    {theme === 'dark' ? (
+                        <SunMedium size={20} className="group-hover:rotate-45 transition-transform" />
+                    ) : (
+                        <MoonStar size={20} className="group-hover:-rotate-12 transition-transform" />
+                    )}
                 </button>
 
-                <div className="flex bg-secondary/50 p-1 rounded-full border border-border/50">
-                    {(['UZ', 'RU', 'EN'] as Language[]).map((lang) => (
-                        <button
-                            key={lang}
-                            onClick={() => setLanguage(lang)}
-                            className={cn(
-                                "px-3 py-1 text-xs font-bold rounded-full transition-all duration-200",
-                                language === lang
-                                    ? "bg-background text-primary shadow-sm scale-105"
-                                    : "text-muted-foreground hover:text-foreground"
-                            )}
-                        >
-                            {lang}
-                        </button>
-                    ))}
+                {/* Language Dropdown */}
+                <div className="relative">
+                    <button
+                        onClick={() => setIsLangOpen(!isLangOpen)}
+                        className="p-3 rounded-full bg-secondary/30 hover:bg-secondary text-foreground border border-transparent hover:border-border transition-all hover:scale-110 active:scale-95 shadow-sm group"
+                        title="Tilni o'zgartirish"
+                    >
+                        <Globe size={20} className={cn("transition-transform duration-500", isLangOpen ? "rotate-180 text-primary" : "group-hover:rotate-12")} />
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    <div className={cn(
+                        "absolute top-full right-0 mt-3 w-32 bg-popover/80 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl p-1.5 flex flex-col gap-1 transition-all duration-300 origin-top-right z-50",
+                        isLangOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+                    )}>
+                        {(['UZ', 'RU', 'EN'] as Language[]).map((lang) => (
+                            <button
+                                key={lang}
+                                onClick={() => {
+                                    setLanguage(lang);
+                                    setIsLangOpen(false);
+                                }}
+                                className={cn(
+                                    "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-bold transition-colors",
+                                    language === lang
+                                        ? "bg-primary text-white shadow-md"
+                                        : "hover:bg-accent/50 text-muted-foreground hover:text-foreground"
+                                )}
+                            >
+                                <span className="text-base">{lang === 'UZ' ? '🇺🇿' : lang === 'RU' ? '🇷🇺' : '🇬🇧'}</span>
+                                {lang}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 <button
                     onClick={onSettingsClick}
-                    className="p-2.5 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
+                    className="p-3 rounded-full hover:bg-secondary/50 text-muted-foreground hover:text-foreground transition-all hover:rotate-90 active:scale-95 group"
                     title="Sozlamalar"
                 >
-                    <Settings size={22} />
+                    <SlidersHorizontal size={22} className="group-hover:text-primary transition-colors" />
                 </button>
             </div>
 
             {/* Mobile Controls Row */}
-            <div className="flex md:hidden w-full items-center justify-between pt-2 border-t border-border/50 mt-1">
+            <div className="flex md:hidden w-full items-center justify-between pt-3 border-t border-border/40 mt-1">
                 <button
                     onClick={toggleTheme}
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground"
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground bg-secondary/30 px-3 py-2 rounded-lg active:scale-95 transition-transform"
                 >
-                    {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                    {theme === 'dark' ? <SunMedium size={18} /> : <MoonStar size={18} />}
                     <span>Rejim</span>
                 </button>
 
@@ -111,10 +133,10 @@ export function Header({ schoolName, subtitle, theme, toggleTheme, language, set
                             key={lang}
                             onClick={() => setLanguage(lang)}
                             className={cn(
-                                "px-2 py-1 text-xs font-bold rounded-md transition-all border",
+                                "px-3 py-1.5 text-xs font-bold rounded-lg transition-all border shadow-sm",
                                 language === lang
-                                    ? "bg-primary text-primary-foreground border-primary"
-                                    : "bg-transparent text-muted-foreground border-transparent"
+                                    ? "bg-primary text-white border-primary"
+                                    : "bg-background/50 text-muted-foreground border-transparent"
                             )}
                         >
                             {lang}

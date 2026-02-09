@@ -1,6 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Trash2, Plus, ChevronsRight, Clock } from 'lucide-react';
+import { Trash2, Plus, ChevronsRight, Clock, Power } from 'lucide-react';
 import type { Lesson, ShiftId, Language } from '@/types';
 import { cn } from '@/lib/utils';
 import React from 'react';
@@ -9,7 +9,7 @@ import { i18n } from '@/lib/i18n';
 interface ScheduleSettingsProps {
     lessonsShift1: Lesson[];
     lessonsShift2: Lesson[];
-    onUpdateLesson: (shift: ShiftId, lessonId: string, field: keyof Lesson, value: string) => void;
+    onUpdateLesson: (shift: ShiftId, lessonId: string, field: keyof Lesson, value: any) => void;
     onAddLesson: (shift: ShiftId) => void;
     onDeleteLesson: (shift: ShiftId, lessonId: string) => void;
     selectedDayLabel: string;
@@ -26,15 +26,19 @@ function LessonRow({
 }: {
     index: number;
     lesson: Lesson;
-    onUpdate: (id: string, f: keyof Lesson, v: string) => void;
+    onUpdate: (id: string, f: keyof Lesson, v: any) => void;
     onDelete: (id: string) => void;
     language: Language;
 }) {
     const t = i18n[language];
     const isValid = lesson.startTime < lesson.endTime;
+    const isActive = lesson.isActive !== false; // Default true if undefined
 
     return (
-        <div className="group relative flex flex-col sm:flex-row items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-card rounded-xl border shadow-sm transition-all hover:shadow-md hover:border-primary/20">
+        <div className={cn(
+            "group relative flex flex-col sm:flex-row items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-card rounded-xl border shadow-sm transition-all hover:shadow-md hover:border-primary/20",
+            !isActive && "opacity-60 grayscale bg-muted/30"
+        )}>
             {/* Index Badge removed as requested */}
 
             {/* Main Content */}
@@ -54,7 +58,7 @@ function LessonRow({
                             value={lesson.startTime}
                             onChange={(e) => onUpdate(lesson.id, 'startTime', e.target.value)}
                             className={cn(
-                                "w-[75px] sm:w-[90px] h-8 p-1 text-center font-mono text-xs sm:text-sm bg-transparent border-none shadow-none focus-visible:ring-0",
+                                "w-[65px] sm:w-[90px] h-8 p-0 sm:p-1 text-center font-mono text-xs sm:text-sm bg-transparent border-none shadow-none focus-visible:ring-0",
                                 index > 0 && "opacity-70 cursor-not-allowed"
                             )}
                             readOnly={index > 0}
@@ -69,7 +73,7 @@ function LessonRow({
                             value={lesson.endTime}
                             onChange={(e) => onUpdate(lesson.id, 'endTime', e.target.value)}
                             className={cn(
-                                "w-[75px] sm:w-[90px] h-8 p-1 text-center font-mono text-xs sm:text-sm bg-transparent border-none shadow-none focus-visible:ring-0",
+                                "w-[65px] sm:w-[90px] h-8 p-0 sm:p-1 text-center font-mono text-xs sm:text-sm bg-transparent border-none shadow-none focus-visible:ring-0",
                                 !isValid && "text-destructive font-bold"
                             )}
                         />
@@ -78,6 +82,19 @@ function LessonRow({
 
                 {/* Actions */}
                 <div className="flex items-center justify-end w-full sm:w-auto gap-2">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onUpdate(lesson.id, 'isActive', !isActive)}
+                        className={cn(
+                            "h-8 w-8 transition-colors",
+                            isActive ? "text-green-500 hover:text-green-600 hover:bg-green-100" : "text-muted-foreground hover:text-primary hover:bg-primary/10"
+                        )}
+                        title={isActive ? "Vaqtincha o'chirish" : "Yoqish"}
+                    >
+                        <Power size={16} />
+                    </Button>
+
                     {!isValid && (
                         <span className="text-xs text-destructive font-semibold mr-2 animate-pulse whitespace-nowrap">
                             {t.timeError}
@@ -109,7 +126,7 @@ function ShiftColumn({
 }: {
     title: string,
     lessons: Lesson[],
-    onUpdate: (id: string, f: keyof Lesson, v: string) => void,
+    onUpdate: (id: string, f: keyof Lesson, v: any) => void,
     onAdd: () => void,
     onDelete: (id: string) => void,
     icon: React.ElementType,

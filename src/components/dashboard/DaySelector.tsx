@@ -41,8 +41,8 @@ export function DaySelector({ selectedDay, onSelect, language }: DaySelectorProp
 
     return (
         <div className="w-full">
-            {/* Mobile: Grid / Desktop: Flex with Scroll/Wrap */}
-            <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center gap-2 w-full sm:justify-center">
+            {/* Mobile: Horizontal Scroll (Stories Style) / Desktop: Flex Center */}
+            <div className="flex sm:flex-wrap items-center sm:justify-center gap-3 w-full p-2 overflow-x-auto sm:overflow-visible no-scrollbar snap-x snap-mandatory px-4 sm:px-0">
                 {DAYS.map((day) => {
                     const isActive = selectedDay === day;
                     const label = t[DAY_KEYS[day]];
@@ -53,19 +53,19 @@ export function DaySelector({ selectedDay, onSelect, language }: DaySelectorProp
                             key={day}
                             onClick={() => onSelect(day)}
                             className={cn(
-                                "relative px-2 py-2 sm:px-5 sm:py-2.5 rounded-lg sm:rounded-full text-sm font-medium transition-all duration-300 border shadow-sm",
+                                "relative flex-shrink-0 snap-center px-3 py-2 sm:px-6 sm:py-3 rounded-2xl text-sm font-medium transition-all duration-300 border backdrop-blur-sm min-w-[65px] sm:min-w-auto flex flex-col items-center justify-center gap-1",
                                 isActive
-                                    ? "bg-primary text-primary-foreground border-primary shadow-md scale-105 font-bold"
-                                    : "bg-card text-muted-foreground border-border hover:bg-accent hover:text-foreground"
+                                    ? "bg-gradient-to-br from-primary to-indigo-600 text-white border-transparent shadow-[0_0_15px_-3px_rgba(79,70,229,0.5)] scale-105 z-10 ring-2 ring-primary/20"
+                                    : "bg-card/40 text-muted-foreground border-white/10 hover:bg-card/60 hover:text-foreground hover:scale-105 active:scale-95 shadow-sm"
                             )}
                         >
-                            {/* Mobile: Short Name, Desktop: Full Name */}
-                            <span className="sm:hidden text-xs uppercase tracking-wider">{shortLabel}</span>
-                            <span className="hidden sm:inline-block whitespace-nowrap">{label}</span>
+                            {/* Mobile: Short Name with Icon-like feel */}
+                            <span className="sm:hidden text-base font-black">{shortLabel}</span>
+                            {/* Desktop: Full Name */}
+                            <span className="hidden sm:inline-block whitespace-nowrap text-base">{label}</span>
 
-                            {isActive && (
-                                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary/50 rounded-full sm:hidden" />
-                            )}
+                            {/* Active Dot for Mobile */}
+                            {isActive && <div className="sm:hidden w-1 h-1 rounded-full bg-white mt-0.5" />}
                         </button>
                     );
                 })}

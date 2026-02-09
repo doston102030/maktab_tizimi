@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GeneralSettings } from './GeneralSettings';
 import { ScheduleSettings } from './ScheduleSettings';
@@ -120,7 +121,7 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
     };
 
     // Schedule Updates
-    const updateLesson = (shift: ShiftId, lessonId: string, field: keyof Lesson, value: string) => {
+    const updateLesson = (shift: ShiftId, lessonId: string, field: keyof Lesson, value: any) => {
         setDraftState(prev => {
             // Deep copy structure to ensure independence
             const newSchedule = { ...prev.schedule };
@@ -202,7 +203,8 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
             id: crypto.randomUUID(),
             name: `${shiftLessons.length + 1}-dars`,
             startTime,
-            endTime
+            endTime,
+            isActive: true
         };
 
         setDraftState(prev => {
@@ -269,25 +271,25 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
 
     return (
 
-        <div className="min-h-screen bg-background pb-32">
+        <div className="min-h-screen bg-transparent pb-32 animate-in fade-in duration-500">
             {/* Sticky Header */}
-            <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
-                <div className="max-w-4xl mx-auto flex h-14 md:h-16 items-center justify-between px-4 sm:px-6">
-                    <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                            <span className="text-lg">⚙️</span>
+            <header className="sticky top-0 z-40 w-full glass border-b-0 shadow-sm rounded-b-2xl mx-auto max-w-5xl mt-2">
+                <div className="flex h-16 items-center justify-between px-6">
+                    <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                            <Settings size={20} />
                         </div>
-                        <h1 className="text-lg md:text-xl font-bold tracking-tight">{t.settings}</h1>
+                        <h1 className="text-xl font-bold tracking-tight text-foreground">{t.settings}</h1>
                     </div>
-                    <Button variant="ghost" onClick={onBack} className="text-muted-foreground hover:text-primary">
+                    <Button variant="ghost" onClick={onBack} className="rounded-full hover:bg-secondary/80">
                         {t.back}
                     </Button>
                 </div>
             </header>
 
-            <main className="max-w-4xl mx-auto p-3 sm:p-6 space-y-6 md:space-y-8">
+            <main className="max-w-4xl mx-auto p-4 sm:p-8 space-y-8">
                 {/* General Settings Section */}
-                <section className="bg-card rounded-2xl border shadow-sm p-4 md:p-6 transition-all hover:shadow-md">
+                <section className="glass-card rounded-3xl p-6 md:p-8">
                     <GeneralSettings
                         schoolName={draftState.config.schoolName}
                         onSchoolNameChange={updateSchoolName}
@@ -302,11 +304,11 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                 </section>
 
                 {/* Schedule Editor Section */}
-                <section className="space-y-4 md:space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
+                <section className="space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
                         <div>
-                            <h3 className="text-lg font-semibold tracking-tight">{t.schedule}</h3>
-                            <p className="text-sm text-muted-foreground">
+                            <h3 className="text-xl font-bold tracking-tight">{t.schedule}</h3>
+                            <p className="text-sm text-muted-foreground font-medium">
                                 {t.schedule} sozlamalari
                             </p>
                         </div>
@@ -315,7 +317,7 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                         </div>
                     </div>
 
-                    <div className="bg-card/50 rounded-2xl border shadow-sm p-2 sm:p-6 transition-all">
+                    <div className="glass-card rounded-3xl p-2 sm:p-6 border-white/10">
                         <ScheduleSettings
                             selectedDayLabel={editDay}
                             lessonsShift1={currentSchedule.shifts['1'].lessons}
@@ -329,20 +331,20 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                 </section>
 
                 {/* Device Settings Section */}
-                <section className="bg-gradient-to-br from-card to-secondary/30 rounded-2xl border shadow-sm p-4 md:p-6">
+                <section className="bg-gradient-to-br from-card/40 to-secondary/40 backdrop-blur-md rounded-3xl border border-white/10 shadow-sm p-6 md:p-8">
                     <DeviceSettings appState={draftState} selectedDay={editDay} language={appState.language} />
                 </section>
             </main>
 
             {/* Floating Save Bar */}
-            <div className="fixed bottom-6 left-0 right-0 px-4 flex justify-center z-50 pointer-events-none">
-                <div className="bg-background/80 backdrop-blur-lg border shadow-xl rounded-full p-2 pr-6 pl-6 flex items-center gap-4 pointer-events-auto max-w-md w-full animate-in slide-in-from-bottom-6 duration-500">
-                    <span className="text-sm font-medium text-muted-foreground flex-1 truncate">
+            <div className="fixed bottom-8 left-0 right-0 px-4 flex justify-center z-50 pointer-events-none">
+                <div className="glass bg-background/60 border border-white/20 shadow-2xl rounded-full p-2 pr-8 pl-8 flex items-center gap-6 pointer-events-auto max-w-lg w-full animate-in slide-in-from-bottom-12 duration-500 hover:scale-105 transition-transform">
+                    <span className="text-sm font-semibold text-foreground/80 flex-1 truncate text-center">
                         {hasInvalidTime ? t.timeError : "O'zgarishlarni saqlashni unutmang"}
                     </span>
                     <Button
                         size="lg"
-                        className={`rounded-full px-8 font-semibold shadow-lg transition-all ${hasInvalidTime ? 'bg-destructive hover:bg-destructive/90' : 'bg-primary hover:bg-primary/90'
+                        className={`rounded-full px-8 font-bold shadow-lg transition-all ${hasInvalidTime ? 'bg-destructive hover:bg-destructive/90' : 'bg-gradient-to-r from-primary to-indigo-600 hover:opacity-90'
                             }`}
                         onClick={() => {
                             handleSave();

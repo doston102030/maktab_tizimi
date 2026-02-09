@@ -26,7 +26,7 @@ export function LessonList({ lessons, activeLessonId, language }: LessonListProp
     };
 
     return (
-        <div className="w-full max-w-3xl flex flex-col gap-3 pb-24 px-1">
+        <div className="w-full max-w-4xl flex flex-col gap-4 pb-32 px-2 perspective-[1000px]">
             {lessons.map((lesson, idx) => {
                 const isLast = idx === lessons.length - 1;
                 const breakDuration = !isLast
@@ -36,7 +36,21 @@ export function LessonList({ lessons, activeLessonId, language }: LessonListProp
                 const isActive = lesson.id === activeLessonId;
 
                 return (
-                    <div key={lesson.id} className="flex flex-col w-full gap-3">
+                    <div
+                        key={lesson.id}
+                        className="flex flex-col w-full gap-4 transition-all duration-500"
+                        style={{
+                            animation: `slideIn 0.5s ease-out forwards ${idx * 0.1}s`,
+                            opacity: 0 // Start hidden for animation
+                        }}
+                    >
+                        <style>{`
+                            @keyframes slideIn {
+                                from { opacity: 0; transform: translateY(20px); }
+                                to { opacity: 1; transform: translateY(0); }
+                            }
+                        `}</style>
+
                         <LessonCard
                             lesson={lesson}
                             index={idx}

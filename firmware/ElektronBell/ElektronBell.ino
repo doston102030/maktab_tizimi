@@ -395,8 +395,11 @@ bool getLocalTm(struct tm *outTm, String *outDate, String *outTime) {
 
 void setBellState(bool on) { digitalWrite(OUTPUT_PIN, on ? HIGH : LOW); }
 
-void triggerBell() {
-  int duration = configDoc["bellDurationSec"].as<int>();
+// Use durationSec if > 0, else use config
+void triggerBell(int durationSec = 0) {
+  int duration = durationSec;
+  if (duration <= 0)
+    duration = configDoc["bellDurationSec"].as<int>();
   if (duration <= 0)
     duration = 5;
   setBellState(true);
@@ -440,7 +443,8 @@ void scheduleLoop() {
     return;
 
   lastBellKey = key;
-  triggerBell();
+  lastBellKey = key;
+  triggerBell(0);
 }
 
 // ======== WEB HANDLERS ========
@@ -514,9 +518,22 @@ void handleGetTime() {
 }
 
 void handlePostTest() {
-  triggerBell();
+  if (!server.hasArg("plain")) {
+    triggerBell(5); // Default fallback
+    server.send(200, "text/plain", "OK (Default 5s)");
+    return;
+  }
+  DynamicJsonDocument doc(256);
+  DeserializationError err = deserializeJson(doc, server.arg("plain"));
+  int duration = 5;
+  if (!err && doc["duration"].is<int>()) {
+    duration = doc["duration"].as<int>();
+  }
+  triggerBell(duration);
   server.send(200, "text/plain", "OK");
 }
+
+void handleOptions() { server.send(200, "text/plain", "OK"); }
 
 // ======== SETUP/LOOP ========
 void setup() {
@@ -557,6 +574,12 @@ void setup() {
   server.on("/api/time", HTTP_POST, handlePostTime);
   server.on("/api/test", HTTP_POST, handlePostTest);
 
+  // Handle preflight requests for CORS
+  server.on("/api/config", HTTP_OPTIONS, handleOptions);
+  server.on("/api/time", HTTP_OPTIONS, handleOptions);
+  server.on("/api/test", HTTP_OPTIONS, handleOptions);
+
+  server.enableCORS(true);
   server.begin();
 }
 
