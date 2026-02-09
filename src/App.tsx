@@ -168,7 +168,7 @@ function App() {
               onSettingsClick={() => setCurrentView('settings')}
             />
 
-            <main className="w-full max-w-5xl px-3 sm:px-6 pb-24 space-y-6 md:space-y-12 flex flex-col items-center mt-4 md:mt-10 z-10">
+            <main className="w-full max-w-5xl px-3 sm:px-6 pb-24 space-y-4 md:space-y-10 flex flex-col items-center mt-2 md:mt-8 z-10">
               <section className="w-full animate-in slide-in-from-top-4 duration-700 fade-in">
                 <DaySelector
                   selectedDay={state.selectedDay}
@@ -177,14 +177,14 @@ function App() {
                 />
               </section>
 
-              <section className="flex flex-col items-center gap-8 w-full animate-in slide-in-from-bottom-6 duration-700 delay-100 fade-in fill-mode-backwards">
+              <section className="flex flex-col items-center gap-4 sm:gap-8 w-full animate-in slide-in-from-bottom-6 duration-700 delay-100 fade-in fill-mode-backwards">
                 <ShiftSelector
                   selectedShift={state.selectedShift}
                   onSelect={(shift) => setState(prev => ({ ...prev, selectedShift: shift }))}
                   language={state.language}
                 />
 
-                <div className="w-full flex justify-center scale-110 active:scale-105 transition-transform duration-300">
+                <div className="w-full flex justify-center scale-100 active:scale-95 transition-transform duration-300">
                   <StatusPill status={status.text} isActive={!!status.activeLessonId} />
                 </div>
               </section>

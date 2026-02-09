@@ -41,8 +41,8 @@ export function DaySelector({ selectedDay, onSelect, language }: DaySelectorProp
 
     return (
         <div className="w-full">
-            {/* Mobile: Horizontal Scroll (Stories Style) / Desktop: Flex Center */}
-            <div className="flex sm:flex-wrap items-center sm:justify-center gap-3 w-full p-2 overflow-x-auto sm:overflow-visible no-scrollbar snap-x snap-mandatory px-4 sm:px-0">
+            {/* Mobile: Grid 3 cols (2 rows) / Desktop: Flex Center */}
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap items-center sm:justify-center w-full px-1 sm:px-0">
                 {DAYS.map((day) => {
                     const isActive = selectedDay === day;
                     const label = t[DAY_KEYS[day]];
@@ -53,14 +53,14 @@ export function DaySelector({ selectedDay, onSelect, language }: DaySelectorProp
                             key={day}
                             onClick={() => onSelect(day)}
                             className={cn(
-                                "relative flex-shrink-0 snap-center px-3 py-2 sm:px-6 sm:py-3 rounded-2xl text-sm font-medium transition-all duration-300 border backdrop-blur-sm min-w-[65px] sm:min-w-auto flex flex-col items-center justify-center gap-1",
+                                "relative flex flex-col items-center justify-center w-full sm:w-auto py-2 sm:px-6 sm:py-3 rounded-xl text-xs font-medium transition-all duration-300 border backdrop-blur-sm",
                                 isActive
-                                    ? "bg-gradient-to-br from-primary to-indigo-600 text-white border-transparent shadow-[0_0_15px_-3px_rgba(79,70,229,0.5)] scale-105 z-10 ring-2 ring-primary/20"
-                                    : "bg-card/40 text-muted-foreground border-white/10 hover:bg-card/60 hover:text-foreground hover:scale-105 active:scale-95 shadow-sm"
+                                    ? "bg-gradient-to-br from-primary to-indigo-600 text-white border-transparent shadow-[0_0_10px_-3px_rgba(79,70,229,0.5)] z-10 ring-1 ring-primary/20 scale-[1.02]"
+                                    : "bg-card/40 text-muted-foreground border-white/10 hover:bg-card/60 hover:text-foreground hover:scale-[1.02] active:scale-95 shadow-sm"
                             )}
                         >
                             {/* Mobile: Short Name with Icon-like feel */}
-                            <span className="sm:hidden text-base font-black">{shortLabel}</span>
+                            <span className="sm:hidden text-xs font-bold uppercase tracking-wider">{shortLabel}</span>
                             {/* Desktop: Full Name */}
                             <span className="hidden sm:inline-block whitespace-nowrap text-base">{label}</span>
 

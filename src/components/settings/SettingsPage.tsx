@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { Settings } from 'lucide-react';
+import { Settings, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GeneralSettings } from './GeneralSettings';
 import { ScheduleSettings } from './ScheduleSettings';
@@ -281,7 +281,11 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                         </div>
                         <h1 className="text-xl font-bold tracking-tight text-foreground">{t.settings}</h1>
                     </div>
-                    <Button variant="ghost" onClick={onBack} className="rounded-full hover:bg-secondary/80">
+                    <Button
+                        onClick={onBack}
+                        className="rounded-xl bg-primary/10 hover:bg-primary/20 text-primary font-bold shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-2 border border-primary/10"
+                    >
+                        <ArrowLeft size={18} />
                         {t.back}
                     </Button>
                 </div>
