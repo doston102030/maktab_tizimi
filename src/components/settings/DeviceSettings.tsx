@@ -34,7 +34,15 @@ export function DeviceSettings({ appState, selectedDay, language }: DeviceSettin
                 if (time) {
                     setStatus('connected');
                     if (proxy !== useProxy) setUseProxy(proxy); // Update UI state if we switched
-                    toast.success(t.connected);
+
+                    // Auto-sync time since no RTC
+                    if (!time.ok || time.local.startsWith('1970')) {
+                        await bellService.syncTime();
+                        toast.success("Vaqt avtomatik to'g'irlandi (RTC yo'q)", { icon: '🕒' });
+                    } else {
+                        toast.success(t.connected);
+                    }
+
                     return true;
                 }
             } catch (error) {

@@ -1,9 +1,8 @@
 #include <ArduinoJson.h>
+#include <LittleFS.h>
 #include <Preferences.h>
-#include <RTClib.h>
 #include <WebServer.h>
 #include <WiFi.h>
-#include <Wire.h>
 #include <time.h>
 
 // ======== USER SETTINGS ========
@@ -14,10 +13,12 @@ static const char *AP_PASS = "12345678"; // 8+ chars or empty for open
 // Default timezone offset (UTC+05:00)
 static const int TZ_DEFAULT_MINUTES = 300;
 
+// Time save interval (60 seconds)
+static const unsigned long TIME_SAVE_INTERVAL_MS = 60000;
+
 // ======== GLOBALS ========
 WebServer server(80);
 Preferences prefs;
-RTC_DS3231 rtc;
 
 static const size_t CONFIG_DOC_SIZE = 12288;
 DynamicJsonDocument configDoc(CONFIG_DOC_SIZE);
@@ -26,6 +27,7 @@ bool timeIsSet = false;
 String lastBellKey = "";
 unsigned long bellActiveUntilMs = 0;
 int tzOffsetMinutes = TZ_DEFAULT_MINUTES;
+unsigned long lastTimeSaveMs = 0;
 
 // ======== DEFAULT CONFIG ========
 const char *DEFAULT_CONFIG_JSON = R"json(
@@ -327,11 +329,15 @@ setInterval(loadTime, 5000);
 
 // ======== HELPERS ========
 String getConfigJson() {
-  String stored = prefs.getString("config", "");
-  if (stored.length() == 0) {
+  File file = LittleFS.open("/config.json", "r");
+  if (!file || file.isDirectory()) {
     return String(DEFAULT_CONFIG_JSON);
   }
-  return stored;
+  String content = file.readString();
+  file.close();
+  if (content.length() == 0)
+    return String(DEFAULT_CONFIG_JSON);
+  return content;
 }
 
 bool loadConfigDoc() {
@@ -348,7 +354,13 @@ bool saveConfigJson(const String &json) {
   DeserializationError err = deserializeJson(configDoc, json);
   if (err)
     return false;
-  prefs.putString("config", json);
+
+  File file = LittleFS.open("/config.json", "w");
+  if (!file)
+    return false;
+
+  file.print(json);
+  file.close();
   return true;
 }
 
@@ -468,6 +480,50 @@ void handlePostConfig() {
   server.send(200, "text/plain", "OK");
 }
 
+// ======== TIME PERSISTENCE (NO RTC) ========
+void saveTimeToFlash() {
+  time_t nowUtc = time(nullptr);
+  if (nowUtc < 100000)
+    return; // Time not valid
+
+  File file = LittleFS.open("/time.json", "w");
+  if (!file)
+    return;
+
+  DynamicJsonDocument doc(128);
+  doc["epoch"] = (long)nowUtc;
+  doc["tz"] = tzOffsetMinutes;
+  serializeJson(doc, file);
+  file.close();
+}
+
+bool restoreTimeFromFlash() {
+  File file = LittleFS.open("/time.json", "r");
+  if (!file)
+    return false;
+
+  DynamicJsonDocument doc(128);
+  DeserializationError err = deserializeJson(doc, file);
+  file.close();
+
+  if (err || !doc["epoch"].is<long>())
+    return false;
+
+  time_t savedEpoch = (time_t)doc["epoch"].as<long>();
+  if (savedEpoch < 100000)
+    return false;
+
+  if (doc["tz"].is<int>()) {
+    tzOffsetMinutes = doc["tz"].as<int>();
+  }
+
+  struct timeval tv;
+  tv.tv_sec = savedEpoch;
+  tv.tv_usec = 0;
+  settimeofday(&tv, nullptr);
+  return true;
+}
+
 void handlePostTime() {
   if (!server.hasArg("plain")) {
     server.send(400, "text/plain", "Missing body");
@@ -481,9 +537,6 @@ void handlePostTime() {
   }
   time_t epoch = (time_t)doc["epoch"].as<long>();
 
-  // Update RTC if present
-  rtc.adjust(DateTime(epoch));
-
   // Update System Time
   if (doc["tzOffsetMinutes"].is<int>()) {
     tzOffsetMinutes = doc["tzOffsetMinutes"].as<int>();
@@ -493,8 +546,12 @@ void handlePostTime() {
   tv.tv_sec = epoch;
   tv.tv_usec = 0;
   settimeofday(&tv, nullptr);
-  rtc.adjust(DateTime(epoch));
   timeIsSet = true;
+
+  // Immediately save to flash
+  saveTimeToFlash();
+  Serial.println("Time set and saved to flash: " + String(epoch));
+
   server.send(200, "text/plain", "OK");
 }
 
@@ -543,25 +600,19 @@ void setup() {
 
   prefs.begin("ebell", false);
   tzOffsetMinutes = prefs.getInt("tz", TZ_DEFAULT_MINUTES);
+
+  if (!LittleFS.begin(true)) {
+    Serial.println("LittleFS Mount Failed");
+  }
+
   loadConfigDoc();
 
-  // Initialize I2C and RTC
-  Wire.begin();
-  if (!rtc.begin()) {
-    Serial.println("RTC not found!");
+  // Restore time from flash (no RTC needed!)
+  if (restoreTimeFromFlash()) {
+    timeIsSet = true;
+    Serial.println("Time restored from flash!");
   } else {
-    // If RTC works, sync time
-    if (rtc.lostPower()) {
-      Serial.println("RTC lost power, please set time!");
-    } else {
-      DateTime now = rtc.now();
-      struct timeval tv;
-      tv.tv_sec = now.unixtime();
-      tv.tv_usec = 0;
-      settimeofday(&tv, nullptr);
-      timeIsSet = true;
-      Serial.println("Time synced from RTC: " + String(now.unixtime()));
-    }
+    Serial.println("No saved time found. Waiting for sync...");
   }
 
   WiFi.mode(WIFI_AP);
@@ -591,6 +642,12 @@ void loop() {
     time_t nowUtc = time(nullptr);
     if (nowUtc > 100000)
       timeIsSet = true;
+  }
+
+  // Save time to flash every 60 seconds
+  if (timeIsSet && (millis() - lastTimeSaveMs > TIME_SAVE_INTERVAL_MS)) {
+    saveTimeToFlash();
+    lastTimeSaveMs = millis();
   }
 
   scheduleLoop();
