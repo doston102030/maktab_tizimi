@@ -22,7 +22,7 @@ export interface TimeStatus {
 }
 
 class BellService {
-    private baseUrl: string = 'http://192.168.4.1'; // Default AP IP
+    private baseUrl: string = ''; // Default to relative path for proxy support
 
     setBaseUrl(url: string) {
         // Remove trailing slash

@@ -17,7 +17,7 @@ interface DeviceSettingsProps {
 export function DeviceSettings({ appState, selectedDay, language }: DeviceSettingsProps) {
     const t = i18n[language];
     const [ip, setIp] = useState('192.168.4.1');
-    const [useProxy, setUseProxy] = useState(false);
+    const [useProxy, setUseProxy] = useState(import.meta.env.DEV);
     const [bellDuration, setBellDuration] = useState('5');
     const [testDuration, setTestDuration] = useState('5');
     const [loading, setLoading] = useState(false);
@@ -25,20 +25,39 @@ export function DeviceSettings({ appState, selectedDay, language }: DeviceSettin
 
     const handleConnect = async () => {
         setLoading(true);
-        const baseUrl = useProxy ? '' : `http://${ip}`;
-        bellService.setBaseUrl(baseUrl);
-        try {
-            const time = await bellService.getTime();
-            if (time) {
-                setStatus('connected');
-                toast.success(t.connected);
+        // Helper to try connecting
+        const tryConnect = async (proxy: boolean) => {
+            const baseUrl = proxy ? '' : `http://${ip}`;
+            bellService.setBaseUrl(baseUrl);
+            try {
+                const time = await bellService.getTime();
+                if (time) {
+                    setStatus('connected');
+                    if (proxy !== useProxy) setUseProxy(proxy); // Update UI state if we switched
+                    toast.success(t.connected);
+                    return true;
+                }
+            } catch (error) {
+                return false;
             }
-        } catch (error) {
-            setStatus('disconnected');
-            toast.error("Qurilma topilmadi");
-        } finally {
-            setLoading(false);
+            return false;
+        };
+
+        // First attempt with current setting
+        let success = await tryConnect(useProxy);
+
+        // If failed and we weren't using proxy, try WITH proxy (fallback)
+        if (!success && !useProxy) {
+            toast('Muqobil ulanish (Proxy)...', { icon: '🔄' });
+            success = await tryConnect(true);
         }
+
+        if (!success) {
+            setStatus('disconnected');
+            toast.error("Qurilma topilmadi. WIFI ga ulanganingizni tekshiring.");
+        }
+
+        setLoading(false);
     };
 
     const handleTestBell = async () => {
