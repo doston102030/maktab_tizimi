@@ -2,8 +2,6 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import type { Lesson, Language } from '@/types';
 import { Clock } from 'lucide-react';
-import { i18n } from '@/lib/i18n';
-
 import { translateLessonName } from '@/lib/translate';
 
 interface LessonCardProps {
@@ -15,7 +13,6 @@ interface LessonCardProps {
 }
 
 export function LessonCard({ lesson, index, language, isActive, children }: LessonCardProps) {
-    const t = i18n[language];
 
     // Dynamic translation for lesson names (handles "1-dars", "2-dars" etc)
     const displayName = React.useMemo(() =>

@@ -8,13 +8,12 @@ import { LessonList } from '@/components/dashboard/LessonList';
 import { StatusPill } from '@/components/dashboard/StatusPill';
 import { SettingsPage } from '@/components/settings/SettingsPage';
 import { LoginPage } from '@/components/auth/LoginPage';
-import type { AppState, Language } from '@/types';
+import type { AppState, Language, DayId } from '@/types';
 import { parse, isWithinInterval, format } from 'date-fns';
 import { i18n } from '@/lib/i18n';
 
 import { INITIAL_STATE } from '@/initialState';
 import { translateLessonName } from '@/lib/translate';
-import type { DayId } from '@/types';
 
 const DAYS: DayId[] = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'];
 
