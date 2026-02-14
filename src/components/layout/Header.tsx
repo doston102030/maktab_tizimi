@@ -42,22 +42,22 @@ export function Header({ schoolName, subtitle, theme, toggleTheme, language, set
                     {/* Main Row */}
                     <div className="w-full flex items-center justify-between z-20">
                         {/* Left: Mega Logo Section */}
-                        <div className="flex-1 flex items-center gap-3 md:gap-10 group cursor-pointer min-w-0">
-                            <div className="relative flex items-center justify-center w-14 h-14 md:w-24 md:h-24 rounded-2xl md:rounded-[2.5rem] bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 shadow-2xl shadow-orange-500/40 group-hover:scale-110 transition-transform duration-500 shrink-0">
+                        <div className="flex items-center gap-5 md:gap-10 group cursor-pointer shrink-0">
+                            <div className="relative flex items-center justify-center w-14 h-14 md:w-24 md:h-24 rounded-2xl md:rounded-[2.5rem] bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 shadow-2xl shadow-orange-500/40 group-hover:scale-110 transition-transform duration-500">
                                 <Bell size={32} className="text-white md:w-16 md:h-16 fill-white/10" />
                             </div>
-                            <div className="flex flex-col justify-center min-w-0">
-                                <h1 className="text-xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-700 dark:from-indigo-400 dark:via-violet-400 dark:to-indigo-300 group-hover:from-primary group-hover:to-primary transition-all leading-none truncate">
+                            <div className="flex flex-col justify-center">
+                                <h1 className="text-xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-700 dark:from-indigo-400 dark:via-violet-400 dark:to-indigo-300 group-hover:from-primary group-hover:to-primary transition-all leading-none">
                                     {schoolName}
                                 </h1>
-                                <span className="text-[10px] md:text-xl font-bold text-muted-foreground/30 tracking-[0.4em] uppercase mt-2 md:mt-4 truncate">
+                                <span className="text-[10px] md:text-xl font-bold text-muted-foreground/30 tracking-[0.4em] uppercase mt-2 md:mt-4">
                                     {subtitle}
                                 </span>
                             </div>
                         </div>
 
                         {/* Controls (Universal Style) */}
-                        <div className="flex items-center gap-2 md:gap-4 shrink-0 bg-background/20 dark:bg-white/5 p-1 rounded-2xl md:p-1.5 ml-2">
+                        <div className="flex items-center gap-2 md:gap-4 shrink-0">
                             <button
                                 onClick={toggleTheme}
                                 className="w-9 h-9 md:w-11 md:h-11 flex items-center justify-center rounded-xl md:rounded-2xl bg-black/[0.03] dark:bg-white/5 border border-black/[0.03] dark:border-white/5 active:scale-90 transition-all shadow-sm hover:bg-black/[0.06] dark:hover:bg-white/10"
