@@ -1,6 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Trash2, Plus, ChevronsRight, Clock, Power } from 'lucide-react';
+import { Trash2, Plus, ChevronsRight, Clock, Power, Sparkles } from 'lucide-react';
 import type { Lesson, ShiftId, Language } from '@/types';
 import { cn } from '@/lib/utils';
 import React from 'react';
@@ -12,6 +12,7 @@ interface ScheduleSettingsProps {
     onUpdateLesson: (shift: ShiftId, lessonId: string, field: keyof Lesson, value: any) => void;
     onAddLesson: (shift: ShiftId) => void;
     onDeleteLesson: (shift: ShiftId, lessonId: string) => void;
+    onLoadStandard: () => void;
     selectedDayLabel: string;
     language: Language;
 }
@@ -180,15 +181,33 @@ export function ScheduleSettings({
     onUpdateLesson,
     onAddLesson,
     onDeleteLesson,
+    onLoadStandard,
+    selectedDayLabel,
     language
 }: ScheduleSettingsProps) {
     const t = i18n[language];
     // Icons for shifts
     const SunIcon = () => <span className="text-xl">☀️</span>;
     const MoonIcon = () => <span className="text-xl">🌙</span>;
-
     return (
         <div className="space-y-6">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex flex-col">
+                    <h3 className="text-xl font-black tracking-tight flex items-center gap-2">
+                        {t.schedule} <span className="text-primary">—</span> {selectedDayLabel}
+                    </h3>
+                </div>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onLoadStandard}
+                    className="rounded-xl border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-bold px-5 flex items-center gap-2 transition-all hover:scale-105 shadow-sm"
+                >
+                    <Sparkles size={16} className="text-primary animate-pulse" />
+                    Standart 5 soatlik jadval
+                </Button>
+            </div>
+
             <div className="flex flex-col xl:flex-row gap-8 xl:gap-12">
                 <ShiftColumn
                     title={t.shift1}

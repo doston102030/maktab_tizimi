@@ -1,13 +1,15 @@
 import { cn } from "@/lib/utils";
+import { Coffee } from "lucide-react";
 
 interface StatusPillProps {
     status: string;
-    variant?: 'active' | 'finished' | 'default';
+    variant?: 'active' | 'finished' | 'default' | 'rest';
 }
 
 export function StatusPill({ status, variant = 'default' }: StatusPillProps) {
     const isActive = variant === 'active';
     const isFinished = variant === 'finished';
+    const isRest = variant === 'rest';
 
     return (
         <div className="flex justify-center w-full py-4">
@@ -17,9 +19,11 @@ export function StatusPill({ status, variant = 'default' }: StatusPillProps) {
                     ? "bg-foreground/95 text-background scale-105 border-primary/50 shadow-primary/30 ring-4 ring-primary/10"
                     : isFinished
                         ? "bg-gradient-to-r from-red-500/10 via-red-500/20 to-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 shadow-red-500/10"
-                        : "bg-white/80 dark:bg-card/40 text-muted-foreground border-black/[0.05] dark:border-white/10"
+                        : isRest
+                            ? "glass-ios bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/40 shadow-[0_0_40px_rgba(16,185,129,0.3)] scale-110 ring-[3px] ring-emerald-500/20 hover:scale-115 transition-all duration-700"
+                            : "bg-white/80 dark:bg-card/40 text-muted-foreground border-black/[0.05] dark:border-white/10"
             )}>
-                {/* Visual Effects for Active/Finished */}
+                {/* Visual Effects for Active/Finished/Rest */}
                 {isActive && (
                     <>
                         <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_3s_infinite]" />
@@ -31,6 +35,14 @@ export function StatusPill({ status, variant = 'default' }: StatusPillProps) {
                     <div className="absolute inset-0 bg-red-500/5 animate-pulse" />
                 )}
 
+                {isRest && (
+                    <>
+                        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/5 via-transparent to-teal-500/10 animate-pulse" />
+                        {/* Moving Border Light */}
+                        <div className="absolute -inset-1 bg-[conic-gradient(from_0deg,transparent,rgba(16,185,129,0.3),transparent,transparent)] animate-[spin_4s_linear_infinite]" />
+                    </>
+                )}
+
                 <span className="relative z-10 flex items-center gap-4">
                     {isActive ? (
                         <span className="relative flex h-4 w-4">
@@ -39,9 +51,19 @@ export function StatusPill({ status, variant = 'default' }: StatusPillProps) {
                         </span>
                     ) : isFinished ? (
                         <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_red]" />
+                    ) : isRest ? (
+                        <div className="relative flex items-center justify-center">
+                            <Coffee size={24} className="text-emerald-500 animate-pulse transition-transform group-hover:rotate-12 duration-500" />
+                            {/* Organic Steam Animation */}
+                            <div className="absolute -top-1 left-1/2 -translate-x-1/2 flex gap-0.5 pointer-events-none">
+                                <div className="w-1.5 h-4 bg-emerald-400/40 rounded-full blur-[2px] animate-[bounce_3s_infinite]" />
+                                <div className="w-1 h-3 bg-emerald-400/30 rounded-full blur-[1px] animate-[bounce_2.5s_infinite_0.4s]" />
+                                <div className="w-1.5 h-4 bg-emerald-400/20 rounded-full blur-[2px] animate-[bounce_3.5s_infinite_0.8s]" />
+                            </div>
+                        </div>
                     ) : null}
 
-                    <span className="tracking-tight">{status}</span>
+                    <span className="tracking-tighter uppercase sm:tracking-[0.05em]">{status}</span>
                 </span>
             </div>
         </div>

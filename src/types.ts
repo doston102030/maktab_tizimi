@@ -1,7 +1,7 @@
 export type Language = 'UZ' | 'RU' | 'EN';
 export type Theme = 'dark' | 'light';
 export type ShiftId = '1' | '2';
-export type DayId = 'Dushanba' | 'Seshanba' | 'Chorshanba' | 'Payshanba' | 'Juma' | 'Shanba';
+export type DayId = 'Dushanba' | 'Seshanba' | 'Chorshanba' | 'Payshanba' | 'Juma' | 'Shanba' | 'Yakshanba';
 
 export interface Lesson {
     id: string;

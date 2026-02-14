@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Header } from '@/components/layout/Header';
+import { Coffee } from 'lucide-react';
 import { DaySelector } from '@/components/dashboard/DaySelector';
 import { ShiftSelector } from '@/components/dashboard/ShiftSelector';
 import { LessonList } from '@/components/dashboard/LessonList';
@@ -15,11 +16,11 @@ import { INITIAL_STATE } from '@/initialState';
 import { translateLessonName } from '@/lib/translate';
 import type { DayId } from '@/types';
 
-const DAYS: DayId[] = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'];
+const DAYS: DayId[] = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'];
 
 function getCurrentDayId(): DayId {
   const dayIndex = new Date().getDay(); // 0 = Yakshanba (Sunday)
-  if (dayIndex === 0) return 'Dushanba'; // Sunday -> Show Monday
+  if (dayIndex === 0) return 'Yakshanba';
   // dayIndex 1=Mon ... 6=Sat.
   // Our array is 0=Mon ... 5=Sat.
   // So: index 1 -> array[0], index 6 -> array[5].
@@ -101,11 +102,16 @@ function App() {
   const activeLessons = currentDaySchedule?.shifts[state.selectedShift]?.lessons || [];
 
   // Logic: Calculate Status
-  const getStatus = (): { text: string; activeLessonId?: string; variant: 'active' | 'finished' | 'default' } => {
+  const getStatus = (): { text: string; activeLessonId?: string; variant: 'active' | 'finished' | 'default' | 'rest' } => {
     // Localization helper
     const t = i18n[state.language];
 
-    if (!activeLessons.length) return { text: t.noLessons, variant: 'default' };
+    if (!activeLessons.length || !currentDaySchedule?.isActive) {
+      if (state.selectedDay === 'Yakshanba') {
+        return { text: "Dam olish kuni", variant: 'rest' };
+      }
+      return { text: t.noLessons, variant: 'default' };
+    }
 
     const todayStr = format(now, 'yyyy-MM-dd');
 
@@ -192,11 +198,49 @@ function App() {
               </section>
 
               <section className="w-full animate-in slide-in-from-bottom-12 duration-1000 delay-200 fade-in fill-mode-backwards">
-                <LessonList
-                  lessons={activeLessons}
-                  activeLessonId={status.activeLessonId}
-                  language={state.language}
-                />
+                {!currentDaySchedule?.isActive && state.selectedDay === 'Yakshanba' ? (
+                  <div className="w-full animate-in zoom-in-95 duration-700 fade-in">
+                    <div className="glass-card bg-background/40 border-white/10 dark:bg-[#0c101d]/40 rounded-[2.5rem] p-8 sm:p-16 flex flex-col items-center justify-center text-center space-y-8 relative overflow-hidden group shadow-2xl">
+                      {/* Background Glows */}
+                      <div className="absolute top-0 left-1/4 w-32 h-32 bg-emerald-500/20 rounded-full blur-[80px] group-hover:bg-emerald-500/30 transition-colors duration-700" />
+                      <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-primary/10 rounded-full blur-[100px] group-hover:bg-primary/20 transition-colors duration-700" />
+
+                      <div className="relative">
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 flex items-center justify-center text-emerald-500 shadow-2xl shadow-emerald-500/20 animate-pulse border border-emerald-500/20 rotate-3 group-hover:rotate-6 transition-transform duration-500">
+                          <Coffee size={56} className="sm:size-72" />
+                        </div>
+                        {/* Little steam bubbles */}
+                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1">
+                          <div className="w-2 h-2 rounded-full bg-emerald-400/40 animate-bounce delay-100" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/30 animate-bounce delay-300" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400/20 animate-bounce delay-500" />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 relative z-10">
+                        <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-black uppercase tracking-[0.2em] shadow-inner">
+                          {state.language === 'UZ' ? 'Hordiq' : state.language === 'RU' ? 'Отдых' : 'Relax'}
+                        </div>
+                        <h3 className="text-4xl sm:text-5xl font-black text-foreground uppercase tracking-tighter bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
+                          Dam olish kuni
+                        </h3>
+                        <p className="text-muted-foreground text-sm sm:text-base font-medium max-w-sm mx-auto leading-relaxed">
+                          Bugun maktabda darslar mavjud emas. <br />
+                          <span className="text-emerald-500/80">Maroqli hordiq chiqaring!</span>
+                        </p>
+                      </div>
+
+                      {/* Bottom Decorative Element */}
+                      <div className="w-32 h-1 bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent rounded-full" />
+                    </div>
+                  </div>
+                ) : (
+                  <LessonList
+                    lessons={activeLessons}
+                    activeLessonId={status.activeLessonId}
+                    language={state.language}
+                  />
+                )}
               </section>
             </main>
           </>

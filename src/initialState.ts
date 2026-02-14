@@ -1,44 +1,55 @@
-import type { AppState, DayId, DaySchedule, Lesson } from './types';
+import type { AppState, DayId, DaySchedule, Lesson, ShiftId } from './types';
+import { parse, format, addMinutes } from 'date-fns';
 
-const DAYS: DayId[] = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'];
+const DAYS: DayId[] = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'];
 
-const createEmptyDaySchedule = (dayId: DayId): DaySchedule => ({
-    dayId,
-    isActive: true, // Default active
-    shifts: {
-        '1': { shiftId: '1', lessons: [] },
-        '2': { shiftId: '2', lessons: [] }
+
+const generateDefaultLessons = (shift: ShiftId): Lesson[] => {
+    const lessons: Lesson[] = [];
+    const baseStart = shift === '1' ? '08:00' : '13:30';
+    const breakPattern = [5, 5, 15, 5, 5]; // 15 min Big Break after 3rd lesson
+
+    let lastEndTime = baseStart;
+
+    for (let i = 0; i < 5; i++) {
+        const startDt = parse(lastEndTime, 'HH:mm', new Date());
+        // If it's not the first lesson, add the break from the pattern
+        const lessonStartDt = i === 0 ? startDt : addMinutes(startDt, breakPattern[i - 1] || 5);
+        const lessonEndDt = addMinutes(lessonStartDt, 45);
+
+        const startTime = format(lessonStartDt, 'HH:mm');
+        const endTime = format(lessonEndDt, 'HH:mm');
+
+        lessons.push({
+            id: crypto.randomUUID(),
+            name: `${i + 1}-dars`,
+            startTime,
+            endTime,
+            isActive: true
+        });
+
+        lastEndTime = endTime;
     }
-});
+    return lessons;
+};
 
 const generateFullSchedule = (): Record<DayId, DaySchedule> => {
     const schedule: Partial<Record<DayId, DaySchedule>> = {};
     DAYS.forEach(day => {
-        schedule[day] = createEmptyDaySchedule(day);
+        schedule[day] = {
+            dayId: day,
+            isActive: day !== 'Yakshanba', // Sunday is inactive by default
+            shifts: {
+                '1': { shiftId: '1', lessons: day === 'Yakshanba' ? [] : generateDefaultLessons('1') },
+                '2': { shiftId: '2', lessons: day === 'Yakshanba' ? [] : generateDefaultLessons('2') }
+            }
+        };
     });
     return schedule as Record<DayId, DaySchedule>;
 };
 
 const EMPTY_SCHEDULE = generateFullSchedule();
 
-// Seed specific data for Payshanba as per original request, but now correctly typed within full structure
-const SEEDED_PAYSHANBA_SHIFT_1: Lesson[] = [
-    { id: '1', name: '1-dars', startTime: '08:00', endTime: '08:45' },
-    { id: '2', name: '2-dars', startTime: '08:50', endTime: '09:35' },
-    { id: '3', name: '3-dars', startTime: '09:40', endTime: '10:25' },
-    { id: '4', name: '4-dars', startTime: '10:30', endTime: '11:15' },
-];
-
-const SEEDED_PAYSHANBA_SHIFT_2: Lesson[] = [
-    { id: '11', name: '1-dars', startTime: '13:30', endTime: '14:15' },
-    { id: '12', name: '2-dars', startTime: '14:20', endTime: '15:05' },
-];
-
-// Apply seeds
-if (EMPTY_SCHEDULE['Payshanba']) {
-    EMPTY_SCHEDULE['Payshanba'].shifts['1'].lessons = SEEDED_PAYSHANBA_SHIFT_1;
-    EMPTY_SCHEDULE['Payshanba'].shifts['2'].lessons = SEEDED_PAYSHANBA_SHIFT_2;
-}
 
 export const INITIAL_STATE: AppState = {
     config: { schoolName: '4-maktab', subtitle: 'Maktab qo\'ng\'irog\'i' },

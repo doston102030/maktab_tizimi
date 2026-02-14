@@ -24,6 +24,7 @@ export function GeneralSettings({ schoolName, onSchoolNameChange, activeDays, on
         { id: 'Payshanba', label: language === 'UZ' ? 'Pay' : language === 'RU' ? 'Чт' : 'Th' },
         { id: 'Juma', label: language === 'UZ' ? 'Ju' : language === 'RU' ? 'Пт' : 'Fr' },
         { id: 'Shanba', label: language === 'UZ' ? 'Sha' : language === 'RU' ? 'Сб' : 'Sa' },
+        { id: 'Yakshanba', label: language === 'UZ' ? 'Ya' : language === 'RU' ? 'Вс' : 'Su' },
     ] as const;
 
     return (

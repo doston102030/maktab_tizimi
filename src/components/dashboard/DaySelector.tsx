@@ -9,7 +9,8 @@ const DAY_KEYS: Record<DayId, keyof typeof i18n['UZ']> = {
     'Chorshanba': 'chorshanba',
     'Payshanba': 'payshanba',
     'Juma': 'juma',
-    'Shanba': 'shanba'
+    'Shanba': 'shanba',
+    'Yakshanba': 'yakshanba'
 };
 
 const DAYS: DayId[] = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'];
@@ -27,7 +28,7 @@ export function DaySelector({ selectedDay, onSelect, language }: DaySelectorProp
     const todayIndex = new Date().getDay();
     const dayToIndex: Record<DayId, number> = {
         'Dushanba': 1, 'Seshanba': 2, 'Chorshanba': 3,
-        'Payshanba': 4, 'Juma': 5, 'Shanba': 6
+        'Payshanba': 4, 'Juma': 5, 'Shanba': 6, 'Yakshanba': 0
     };
 
     // Color mapping for each day
@@ -47,7 +48,8 @@ export function DaySelector({ selectedDay, onSelect, language }: DaySelectorProp
             'Chorshanba': "bg-purple-500/5 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20 hover:border-purple-500/40 hover:bg-purple-500/10",
             'Payshanba': "bg-pink-500/5 dark:bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20 hover:border-pink-500/40 hover:bg-pink-500/10",
             'Juma': "bg-sky-500/5 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20 hover:border-sky-500/40 hover:bg-sky-500/10",
-            'Shanba': "bg-indigo-500/5 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20 hover:border-indigo-500/40 hover:bg-indigo-500/10"
+            'Shanba': "bg-indigo-500/5 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20 hover:border-indigo-500/40 hover:bg-indigo-500/10",
+            'Yakshanba': "bg-red-500/5 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20 hover:border-red-500/40 hover:bg-red-500/10"
         };
         return inactiveColors[day];
     };

@@ -17,8 +17,8 @@ interface SettingsPageProps {
     onBack: () => void;
 }
 
-// Break pattern: after 1st lesson (5min), 2nd (10min), 3rd (10min), 4th (5min), 5th (5min)
-const BREAKS = [5, 10, 10, 5, 5];
+// Break pattern: after 1st lesson (5min), 2nd (5min), 3rd (15min BIG), 4th (5min), 5th (5min)
+const BREAKS = [5, 5, 15, 5, 5, 5, 10];
 
 // Helper: Recalculate lesson times preserving durations and enforcing variable gaps
 const recalculateLessons = (lessons: Lesson[]): Lesson[] => {
@@ -259,6 +259,46 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
         });
     };
 
+    const loadStandardSchedule = () => {
+        const generateDefault = (shift: ShiftId): Lesson[] => {
+            const lessons: Lesson[] = [];
+            const baseStart = shift === '1' ? '08:00' : '13:30';
+            const breakPattern = [5, 5, 15, 5, 5, 5]; // Big break after 3rd
+
+            let lastEndTime = baseStart;
+            for (let i = 0; i < 5; i++) {
+                const startDt = parse(lastEndTime, 'HH:mm', new Date());
+                const lessonStartDt = i === 0 ? startDt : addMinutes(startDt, breakPattern[i - 1] || 5);
+                const lessonEndDt = addMinutes(lessonStartDt, 45);
+                lessons.push({
+                    id: crypto.randomUUID(),
+                    name: `${i + 1}-dars`,
+                    startTime: format(lessonStartDt, 'HH:mm'),
+                    endTime: format(lessonEndDt, 'HH:mm'),
+                    isActive: true
+                });
+                lastEndTime = format(lessonEndDt, 'HH:mm');
+            }
+            return lessons;
+        };
+
+        setDraftState(prev => ({
+            ...prev,
+            schedule: {
+                ...prev.schedule,
+                [editDay]: {
+                    ...prev.schedule[editDay]!,
+                    isActive: true,
+                    shifts: {
+                        '1': { shiftId: '1', lessons: generateDefault('1') },
+                        '2': { shiftId: '2', lessons: generateDefault('2') }
+                    }
+                }
+            }
+        }));
+        toast.success("Standart jadval yuklandi");
+    };
+
     // Active days list for GeneralSettings
     const activeDays = Object.values(draftState.schedule)
         .filter(d => d.isActive).map(d => d.dayId);
@@ -320,7 +360,7 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                         </p>
                     </div>
 
-                    <div className="w-full flex justify-center">
+                    <div className="w-full flex justify-center mb-4">
                         <DaySelector selectedDay={editDay} onSelect={setEditDay} language={appState.language} />
                     </div>
 
@@ -332,6 +372,7 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                             onUpdateLesson={updateLesson}
                             onAddLesson={addLesson}
                             onDeleteLesson={deleteLesson}
+                            onLoadStandard={loadStandardSchedule}
                             language={appState.language}
                         />
                     </div>
