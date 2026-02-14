@@ -9,6 +9,7 @@ import { DeviceSettings } from './DeviceSettings';
 import type { AppState, DayId, Lesson, ShiftId } from '@/types';
 import { addMinutes, differenceInMinutes, parse, format, isValid as isValidDate } from 'date-fns';
 import { i18n } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 
 interface SettingsPageProps {
     appState: AppState;
@@ -271,16 +272,10 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
 
     return (
 
-        <div className="min-h-screen bg-transparent pb-32 animate-in fade-in duration-500">
+        <div className="min-h-screen bg-transparent pb-20 animate-in fade-in duration-500">
             {/* Sticky Header */}
-            <header className="sticky top-0 z-40 w-full glass border-b-0 shadow-sm rounded-b-2xl mx-auto max-w-5xl mt-2">
+            <header className="sticky top-0 z-40 w-full glass-ios shadow-sm rounded-b-2xl mx-auto max-w-5xl">
                 <div className="flex h-16 items-center justify-between px-6">
-                    <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-primary/20">
-                            <Settings size={20} />
-                        </div>
-                        <h1 className="text-xl font-bold tracking-tight text-foreground">{t.settings}</h1>
-                    </div>
                     <Button
                         onClick={onBack}
                         className="rounded-xl bg-primary/10 hover:bg-primary/20 text-primary font-bold shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-2 border border-primary/10"
@@ -288,10 +283,16 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                         <ArrowLeft size={18} />
                         {t.back}
                     </Button>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-xl font-bold tracking-tight text-foreground">{t.settings}</h1>
+                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                            <Settings size={20} />
+                        </div>
+                    </div>
                 </div>
             </header>
 
-            <main className="max-w-4xl mx-auto p-4 sm:p-8 space-y-8">
+            <main className="max-w-5xl mx-auto p-4 sm:p-8 space-y-8">
                 {/* General Settings Section */}
                 <section className="glass-card rounded-3xl p-6 md:p-8">
                     <GeneralSettings
@@ -301,24 +302,26 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                         onToggleDay={toggleWorkingDay}
                         onSave={() => {
                             handleSave();
-                            toast.success(t.saved);
+                            toast.success(t.saved, { id: 'save-settings' });
                         }}
                         language={appState.language}
                     />
                 </section>
 
                 {/* Schedule Editor Section */}
-                <section className="space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
-                        <div>
-                            <h3 className="text-xl font-bold tracking-tight">{t.schedule}</h3>
-                            <p className="text-sm text-muted-foreground font-medium">
-                                {t.schedule} sozlamalari
-                            </p>
+                <section className="space-y-8">
+                    <div className="flex flex-col items-center text-center space-y-3 px-2">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest">
+                            {i18n.UZ.schedule === t.schedule ? 'Dars Jadvali' : t.schedule}
                         </div>
-                        <div className="w-full sm:w-auto">
-                            <DaySelector selectedDay={editDay} onSelect={setEditDay} language={appState.language} />
-                        </div>
+                        <h3 className="text-3xl font-black tracking-tight">{t.schedule}</h3>
+                        <p className="text-muted-foreground text-sm max-w-md mx-auto">
+                            Haftalik dars jadvalini shakllantiring va qo'ng'iroq vaqtlarini sozlang
+                        </p>
+                    </div>
+
+                    <div className="w-full flex justify-center">
+                        <DaySelector selectedDay={editDay} onSelect={setEditDay} language={appState.language} />
                     </div>
 
                     <div className="glass-card rounded-3xl p-2 sm:p-6 border-white/10">
@@ -342,17 +345,21 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
 
             {/* Floating Save Bar */}
             <div className="fixed bottom-8 left-0 right-0 px-4 flex justify-center z-50 pointer-events-none">
-                <div className="glass bg-background/60 border border-white/20 shadow-2xl rounded-full p-2 pr-8 pl-8 flex items-center gap-6 pointer-events-auto max-w-lg w-full animate-in slide-in-from-bottom-12 duration-500 hover:scale-105 transition-transform">
-                    <span className="text-sm font-semibold text-foreground/80 flex-1 truncate text-center">
+                <div className="glass-ios bg-background/95 dark:bg-[#0c101d]/95 border border-white/20 shadow-2xl rounded-full p-2 pr-2 pl-8 flex items-center gap-6 pointer-events-auto max-w-lg w-full animate-in slide-in-from-bottom-12 duration-500 hover:scale-105 transition-transform">
+                    <span className="text-sm font-bold text-foreground/80 flex-1 truncate text-center">
                         {hasInvalidTime ? t.timeError : "O'zgarishlarni saqlashni unutmang"}
                     </span>
                     <Button
                         size="lg"
-                        className={`rounded-full px-8 font-bold shadow-lg transition-all ${hasInvalidTime ? 'bg-destructive hover:bg-destructive/90' : 'bg-gradient-to-r from-primary to-indigo-600 hover:opacity-90'
-                            }`}
+                        className={cn(
+                            "rounded-full px-10 font-black shadow-lg shadow-emerald-500/20 transition-all",
+                            hasInvalidTime
+                                ? "bg-destructive hover:bg-destructive/90 text-white"
+                                : "bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:opacity-90 active:scale-95"
+                        )}
                         onClick={() => {
                             handleSave();
-                            toast.success(t.saved);
+                            toast.success(t.saved, { id: 'save-settings' });
                         }}
                         disabled={hasInvalidTime}
                     >
@@ -360,6 +367,7 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                     </Button>
                 </div>
             </div>
+
         </div>
     );
 }

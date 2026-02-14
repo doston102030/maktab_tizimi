@@ -40,7 +40,7 @@ export function DeviceSettings({ appState, selectedDay, language }: DeviceSettin
                         await bellService.syncTime();
                         toast.success("Vaqt avtomatik to'g'irlandi (RTC yo'q)", { icon: '🕒' });
                     } else {
-                        toast.success(t.connected);
+                        toast.success(t.connected, { id: 'device-connection' });
                     }
 
                     return true;
@@ -138,7 +138,7 @@ export function DeviceSettings({ appState, selectedDay, language }: DeviceSettin
 
         try {
             await bellService.saveConfig(config);
-            toast.success("Jadval qurilmaga yuklandi");
+            toast.success("Jadval qurilmaga yuklandi", { id: 'schedule-sync' });
         } catch (e) {
             toast.error("Yuklashda xatolik");
         }

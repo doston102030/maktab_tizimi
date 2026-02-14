@@ -12,6 +12,7 @@ import { parse, isWithinInterval, format } from 'date-fns';
 import { i18n } from '@/lib/i18n';
 
 import { INITIAL_STATE } from '@/initialState';
+import { translateLessonName } from '@/lib/translate';
 import type { DayId } from '@/types';
 
 const DAYS: DayId[] = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'];
@@ -100,11 +101,11 @@ function App() {
   const activeLessons = currentDaySchedule?.shifts[state.selectedShift]?.lessons || [];
 
   // Logic: Calculate Status
-  const getStatus = (): { text: string; activeLessonId?: string } => {
+  const getStatus = (): { text: string; activeLessonId?: string; variant: 'active' | 'finished' | 'default' } => {
     // Localization helper
     const t = i18n[state.language];
 
-    if (!activeLessons.length) return { text: t.noLessons };
+    if (!activeLessons.length) return { text: t.noLessons, variant: 'default' };
 
     const todayStr = format(now, 'yyyy-MM-dd');
 
@@ -114,31 +115,31 @@ function App() {
     // Check if finished
     const lastLesson = sorted[sorted.length - 1];
     const lastEnd = parse(`${todayStr} ${lastLesson.endTime}`, 'yyyy-MM-dd HH:mm', now);
-    if (now > lastEnd) return { text: t.finished };
+    if (now > lastEnd) return { text: t.finished, variant: 'finished' };
 
     // Check if not started
     const firstLesson = sorted[0];
     const firstStart = parse(`${todayStr} ${firstLesson.startTime}`, 'yyyy-MM-dd HH:mm', now);
-    if (now < firstStart) return { text: t.notStarted };
+    if (now < firstStart) return { text: t.notStarted, variant: 'default' };
 
     // Check if inside a lesson
     for (const lesson of sorted) {
       const start = parse(`${todayStr} ${lesson.startTime}`, 'yyyy-MM-dd HH:mm', now);
       const end = parse(`${todayStr} ${lesson.endTime}`, 'yyyy-MM-dd HH:mm', now);
       if (isWithinInterval(now, { start, end })) {
-        return { text: `${lesson.name}`, activeLessonId: lesson.id };
+        return { text: translateLessonName(lesson.name, state.language), activeLessonId: lesson.id, variant: 'active' };
       }
     }
 
     // Must be break
-    return { text: t.break };
+    return { text: t.break, variant: 'default' };
   };
 
   const status = getStatus();
 
   return (
-    <div className="min-h-screen bg-transparent text-foreground flex flex-col items-center relative overflow-hidden transition-colors duration-500">
-      <Toaster position="top-right" toastOptions={{
+    <div className="min-h-screen bg-transparent text-foreground flex flex-col items-center relative overflow-x-hidden transition-colors duration-500">
+      <Toaster position="top-center" toastOptions={{
         style: {
           background: 'hsl(var(--card))',
           color: 'hsl(var(--foreground))',
@@ -146,11 +147,12 @@ function App() {
         },
       }} />
 
-      {/* Dynamic Background Blobs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        <div className="absolute top-0 left-1/4 w-72 h-72 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute top-0 right-1/4 w-72 h-72 bg-indigo-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-32 left-1/3 w-72 h-72 bg-purple-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+
+      {/* Mega Mesh Background Layer */}
+      <div className="mega-mesh">
+        <div className="mega-mesh-orb-1" />
+        <div className="mega-mesh-orb-2" />
+        <div className="mega-mesh-orb-3" />
       </div>
 
       {!isAuthenticated ? (
@@ -168,7 +170,7 @@ function App() {
               onSettingsClick={() => setCurrentView('settings')}
             />
 
-            <main className="w-full max-w-5xl px-3 sm:px-6 pb-24 space-y-4 md:space-y-10 flex flex-col items-center mt-2 md:mt-8 z-10">
+            <main className="w-full max-w-3xl px-3 sm:px-6 pb-24 space-y-6 md:space-y-8 flex flex-col items-center mt-2 md:mt-4 z-10">
               <section className="w-full animate-in slide-in-from-top-4 duration-700 fade-in">
                 <DaySelector
                   selectedDay={state.selectedDay}
@@ -185,7 +187,7 @@ function App() {
                 />
 
                 <div className="w-full flex justify-center scale-100 active:scale-95 transition-transform duration-300">
-                  <StatusPill status={status.text} isActive={!!status.activeLessonId} />
+                  <StatusPill status={status.text} variant={status.variant} />
                 </div>
               </section>
 

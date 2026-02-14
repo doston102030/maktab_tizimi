@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,74 +6,48 @@
 
 @layer base {
   :root {
-    /* Premium Light: Soft Silver-Blue Gradient setup */
-    --background: 210 40% 98%;
-    /* Fallback */
-    /* Soft bluish white */
-    --foreground: 222.2 84% 4.9%;
-
+    --background: 210 50% 98%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
+    --popover-foreground: 222 47% 11%;
     --primary: 221.2 83.2% 53.3%;
-    /* Vibrant Blue */
     --primary-foreground: 210 40% 98%;
-
     --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 95%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
+    --accent: 221.2 83.2% 53.3% / 0.1;
+    --accent-foreground: 222 47% 11%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
-
-    --radius: 1rem;
-    /* More rounded corners for modern feel */
+    --radius: 1.25rem;
   }
 
   .dark {
-    /* Premium Dark: Deep Midnight Gradient setup */
-    --background: 224 71% 4%;
-    /* Fallback */
-    /* Very deep blue/black */
+    --background: 224 71% 2%;
     --foreground: 210 40% 98%;
-
-    --card: 222 47% 11%;
-    /* Slightly lighter deep blue */
+    --card: 224 81% 4%;
     --card-foreground: 210 40% 98%;
-
-    --popover: 222 47% 11%;
+    --popover: 224 71% 4%;
     --popover-foreground: 210 40% 98%;
-
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 224 71% 8%;
     --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
+    --muted: 224 71% 8%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 91% 60% / 0.15;
     --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --border: 224 71% 10%;
+    --input: 224 71% 10%;
+    --ring: 217 91% 60%;
   }
 }
 
@@ -86,35 +60,158 @@
     scroll-behavior: smooth;
   }
 
+  /* Premium Global Backgrounds */
   body {
-    /* Super Premium Vibrant Background */
-    @apply bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary;
-
-    /* Dynamic Mesh Gradient - Vivid & Deep */
-    background-color: #eef2ff;
-    background-image:
-      radial-gradient(at 0% 0%, hsla(253, 70%, 75%, 0.5) 0, transparent 50%),
-      radial-gradient(at 50% 0%, hsla(225, 80%, 70%, 0.5) 0, transparent 50%),
-      radial-gradient(at 100% 0%, hsla(300, 70%, 75%, 0.5) 0, transparent 50%),
-      radial-gradient(at 0% 50%, hsla(180, 70%, 70%, 0.4) 0, transparent 50%),
-      radial-gradient(at 100% 50%, hsla(280, 80%, 70%, 0.4) 0, transparent 50%),
-      radial-gradient(at 50% 100%, hsla(240, 70%, 70%, 0.5) 0, transparent 50%);
-
-    background-attachment: fixed;
-    background-size: 150% 150%;
-    animation: gradientMove 15s ease infinite alternate;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-700;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
   }
 
-  .dark body {
-    /* Electric Midnight */
-    background-color: #020617;
-    background-image:
-      radial-gradient(at 0% 0%, hsla(260, 60%, 20%, 0.6) 0, transparent 50%),
-      radial-gradient(at 100% 0%, hsla(220, 60%, 25%, 0.6) 0, transparent 50%),
-      radial-gradient(at 50% 50%, hsla(280, 50%, 15%, 0.4) 0, transparent 50%),
-      radial-gradient(at 0% 100%, hsla(240, 60%, 20%, 0.6) 0, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(320, 50%, 20%, 0.6) 0, transparent 50%);
+  /* Mega Animated Mesh - Shared Logic */
+  .mega-mesh {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background-color: var(--background);
+  }
+
+  .mega-mesh::before,
+  .mega-mesh::after,
+  [class*="mega-mesh-orb-"] {
+    content: '';
+    position: absolute;
+    filter: blur(100px);
+    border-radius: 50%;
+    opacity: 0.15;
+    mix-blend-mode: normal;
+    animation: floatingOrb 25s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
+    pointer-events: none;
+  }
+
+  @keyframes floatingOrb {
+    0% {
+      transform: translate(0, 0) scale(1);
+    }
+
+    33% {
+      transform: translate(10vw, 15vh) scale(1.2);
+    }
+
+    66% {
+      transform: translate(-5vw, 25vh) scale(0.8);
+    }
+
+    100% {
+      transform: translate(5vw, -10vh) scale(1.1);
+    }
+  }
+
+  :root .mega-mesh-orb-1 {
+    width: 60vw;
+    height: 60vw;
+    top: -20%;
+    left: -10%;
+    background: radial-gradient(circle, hsla(210, 100%, 70%, 0.4), transparent);
+    animation-delay: 0s;
+  }
+
+  :root .mega-mesh-orb-2 {
+    width: 50vw;
+    height: 50vw;
+    bottom: -10%;
+    right: -5%;
+    background: radial-gradient(circle, hsla(190, 100%, 65%, 0.3), transparent);
+    animation-delay: -5s;
+  }
+
+  :root .mega-mesh-orb-3 {
+    width: 40vw;
+    height: 40vw;
+    top: 30%;
+    right: 10%;
+    background: radial-gradient(circle, hsla(230, 100%, 75%, 0.2), transparent);
+    animation-delay: -10s;
+  }
+
+  .dark .mega-mesh-orb-1 {
+    background: radial-gradient(circle, hsla(217, 100%, 65%, 0.15), transparent);
+    width: 80vw;
+    height: 80vw;
+    top: -30%;
+    animation-duration: 30s;
+  }
+
+  .dark .mega-mesh-orb-2 {
+    background: radial-gradient(circle, hsla(250, 100%, 60%, 0.1), transparent);
+    width: 70vw;
+    height: 70vw;
+    animation-duration: 25s;
+  }
+
+  .dark .mega-mesh-orb-3 {
+    background: radial-gradient(circle, hsla(190, 100%, 50%, 0.08), transparent);
+    width: 60vw;
+    height: 60vw;
+    animation-duration: 20s;
+  }
+
+  /* Iridescent & Shimmer Effects */
+  .mega-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mega-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: -100%;
+    background: linear-gradient(45deg,
+        transparent 45%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 55%);
+    animation: mirrorShine 6s infinite linear;
+    pointer-events: none;
+  }
+
+  .dark .mega-shimmer::after {
+    background: linear-gradient(45deg,
+        transparent 45%,
+        rgba(255, 255, 255, 0.05) 50%,
+        transparent 55%);
+  }
+
+  @keyframes mirrorShine {
+    0% {
+      transform: translateX(-100%) translateY(-100%);
+    }
+
+    20% {
+      transform: translateX(100%) translateY(100%);
+    }
+
+    100% {
+      transform: translateX(100%) translateY(100%);
+    }
+  }
+
+  .mega-pulse {
+    animation: megaPulse 2s infinite ease-in-out;
+  }
+
+  @keyframes megaPulse {
+
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(var(--primary), 0.4);
+    }
+
+    50% {
+      box-shadow: 0 0 20px 4px rgba(var(--primary), 0.2);
+    }
   }
 
   @keyframes gradientMove {
@@ -161,21 +258,91 @@
   }
 
   .glass {
-    @apply bg-background/70 backdrop-blur-xl border border-white/30 shadow-sm supports-[backdrop-filter]:bg-background/50;
+    background-color: hsl(var(--background) / 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: var(--shadow-sm);
   }
 
   .glass-card {
-    @apply bg-card/70 backdrop-blur-xl border border-white/20 shadow-sm hover:shadow-lg transition-all duration-500 ring-1 ring-white/10 hover:bg-card/80;
+    background-color: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark .glass-card {
+    background-color: rgba(12, 16, 29, 0.6);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), 0 0 20px rgba(59, 130, 246, 0.05);
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-500 to-blue-600 animate-in fade-in;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-500 to-blue-600;
   }
 
   .mesh-gradient {
     background-image: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
       radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
       radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+  }
+
+  /* Aura Animations */
+  @keyframes aura-rotate {
+    0% {
+      transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+      transform: rotate(180deg) scale(1.15);
+    }
+
+    100% {
+      transform: rotate(360deg) scale(1);
+    }
+  }
+
+  .animate-aura {
+    animation: aura-rotate 10s ease-in-out infinite;
+  }
+
+  .glass-ios {
+    background-color: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  }
+
+  .dark .glass-ios {
+    background-color: rgba(10, 12, 20, 0.7);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 0 15px 40px 0 rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  }
+
+  .mega-shimmer-fast {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mega-shimmer-fast::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmer-fast 1.5s infinite;
+  }
+
+  @keyframes shimmer-fast {
+    100% {
+      transform: translateX(100%);
+    }
   }
 }
 

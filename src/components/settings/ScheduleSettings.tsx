@@ -36,29 +36,27 @@ function LessonRow({
 
     return (
         <div className={cn(
-            "group relative flex flex-col sm:flex-row items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-card rounded-xl border shadow-sm transition-all hover:shadow-md hover:border-primary/20",
+            "group relative flex flex-col sm:flex-row items-center gap-3 sm:gap-4 p-3 bg-card rounded-2xl border shadow-sm transition-all hover:shadow-md hover:border-primary/30 w-full overflow-hidden",
             !isActive && "opacity-60 grayscale bg-muted/30"
         )}>
-            {/* Index Badge removed as requested */}
-
             {/* Main Content */}
-            <div className="flex-1 w-full grid grid-cols-[1fr,auto] sm:grid-cols-[1fr,auto,auto] gap-2 sm:gap-3 items-center">
+            <div className="flex-1 w-full grid grid-cols-[1fr,auto] sm:grid-cols-[1fr,auto,auto] gap-3 sm:gap-4 items-center">
                 {/* Name */}
-                <div className="col-span-2 sm:col-span-1">
-                    <span className="text-sm font-medium text-muted-foreground ml-1">
+                <div className="col-span-2 sm:col-span-1 min-w-0">
+                    <span className="text-sm sm:text-base font-bold text-foreground ml-1 truncate block">
                         {lesson.name}
                     </span>
                 </div>
 
                 {/* Time Inputs Group */}
-                <div className="flex items-center gap-2 bg-secondary/30 p-1 rounded-lg border border-transparent focus-within:border-primary/20 focus-within:bg-secondary/50 transition-all justify-start sm:justify-start">
+                <div className="flex items-center gap-2 bg-secondary/40 p-1.5 rounded-xl border border-transparent focus-within:border-primary/30 focus-within:bg-secondary/60 transition-all justify-start sm:justify-start ring-offset-background group-hover:bg-secondary/70">
                     <div className="relative">
                         <Input
                             type="time"
                             value={lesson.startTime}
                             onChange={(e) => onUpdate(lesson.id, 'startTime', e.target.value)}
                             className={cn(
-                                "w-[65px] sm:w-[90px] h-8 p-0 sm:p-1 text-center font-mono text-xs sm:text-sm bg-transparent border-none shadow-none focus-visible:ring-0",
+                                "w-[75px] sm:w-[95px] h-9 p-0 sm:p-1 text-center font-black tabular-nums text-sm sm:text-base bg-transparent border-none shadow-none focus-visible:ring-0",
                                 index > 0 && "opacity-70 cursor-not-allowed"
                             )}
                             readOnly={index > 0}
@@ -66,37 +64,37 @@ function LessonRow({
                             aria-invalid={!isValid}
                         />
                     </div>
-                    <ChevronsRight size={14} className="text-muted-foreground shrink-0" />
+                    <ChevronsRight size={16} className="text-primary/60 shrink-0" />
                     <div className="relative">
                         <Input
                             type="time"
                             value={lesson.endTime}
                             onChange={(e) => onUpdate(lesson.id, 'endTime', e.target.value)}
                             className={cn(
-                                "w-[65px] sm:w-[90px] h-8 p-0 sm:p-1 text-center font-mono text-xs sm:text-sm bg-transparent border-none shadow-none focus-visible:ring-0",
-                                !isValid && "text-destructive font-bold"
+                                "w-[75px] sm:w-[95px] h-9 p-0 sm:p-1 text-center font-black tabular-nums text-sm sm:text-base bg-transparent border-none shadow-none focus-visible:ring-0",
+                                !isValid && "text-destructive font-black"
                             )}
                         />
                     </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-end w-full sm:w-auto gap-2">
+                <div className="flex items-center justify-end w-full sm:w-auto gap-3">
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => onUpdate(lesson.id, 'isActive', !isActive)}
                         className={cn(
-                            "h-8 w-8 transition-colors",
-                            isActive ? "text-green-500 hover:text-green-600 hover:bg-green-100" : "text-muted-foreground hover:text-primary hover:bg-primary/10"
+                            "h-9 w-9 rounded-xl transition-all",
+                            isActive ? "text-green-500 bg-green-500/10 hover:bg-green-500/20 shadow-sm shadow-green-500/10" : "text-muted-foreground bg-secondary/50 hover:text-primary hover:bg-primary/10"
                         )}
                         title={isActive ? "Vaqtincha o'chirish" : "Yoqish"}
                     >
-                        <Power size={16} />
+                        <Power size={18} />
                     </Button>
 
                     {!isValid && (
-                        <span className="text-xs text-destructive font-semibold mr-2 animate-pulse whitespace-nowrap">
+                        <span className="text-xs text-destructive font-black mr-2 animate-pulse whitespace-nowrap">
                             {t.timeError}
                         </span>
                     )}
@@ -105,9 +103,9 @@ function LessonRow({
                         variant="ghost"
                         size="icon"
                         onClick={() => onDelete(lesson.id)}
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                        className="h-9 w-9 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all hover:scale-105"
                     >
-                        <Trash2 size={16} />
+                        <Trash2 size={18} />
                     </Button>
                 </div>
             </div>
@@ -134,7 +132,7 @@ function ShiftColumn({
 }) {
     const t = i18n[language];
     return (
-        <div className="flex-1 flex flex-col gap-4">
+        <div className="flex-1 flex flex-col gap-4 min-w-0 w-full">
             <div className="flex items-center gap-2 px-1">
                 <div className="p-1.5 rounded-md bg-primary/10 text-primary">
                     <Icon size={18} />
@@ -145,7 +143,7 @@ function ShiftColumn({
                 </span>
             </div>
 
-            <div className="flex flex-col gap-3 min-h-[200px] md:min-h-[300px]">
+            <div className="flex flex-col gap-3 min-h-[200px] md:min-h-[300px] w-full min-w-0">
                 {lessons.length === 0 ? (
                     <div className="flex-1 flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl bg-secondary/5 text-muted-foreground">
                         <Clock className="w-8 h-8 opacity-20 mb-2" />
@@ -191,7 +189,7 @@ export function ScheduleSettings({
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex flex-col xl:flex-row gap-8 xl:gap-12">
                 <ShiftColumn
                     title={t.shift1}
                     lessons={lessonsShift1}
@@ -203,7 +201,7 @@ export function ScheduleSettings({
                 />
 
                 {/* Visual Separator for Desktop */}
-                <div className="hidden lg:block w-px bg-border my-4" />
+                <div className="hidden xl:block w-px bg-border my-4" />
 
                 <ShiftColumn
                     title={t.shift2}

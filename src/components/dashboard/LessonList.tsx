@@ -3,6 +3,7 @@ import { LessonCard } from './LessonCard';
 import { BreakInfo } from './BreakInfo';
 import { differenceInMinutes, parse } from 'date-fns';
 import { i18n } from '@/lib/i18n';
+import { Bell } from 'lucide-react';
 
 interface LessonListProps {
     lessons: Lesson[];
@@ -55,7 +56,21 @@ export function LessonList({ lessons, activeLessonId, language }: LessonListProp
                             lesson={lesson}
                             index={idx}
                             isActive={isActive}
-                        />
+                            language={language}
+                        >
+                            {/* Aura Bell Design (Premium) */}
+                            {isActive && (
+                                <div className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 group z-20">
+                                    <div className="relative">
+                                        {/* Glowing Ring */}
+                                        <div className="absolute inset-0 bg-primary/20 rounded-full blur-md animate-pulse scale-150" />
+                                        <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-ios flex items-center justify-center border-primary/30 group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-primary/10">
+                                            <Bell size={20} className="text-primary fill-primary/20 animate-[shake_2s_infinite]" />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </LessonCard>
 
                         {!isLast && breakDuration > 0 && (
                             <BreakInfo duration={breakDuration} label={t.break} />
