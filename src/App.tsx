@@ -8,6 +8,7 @@ import { LessonList } from '@/components/dashboard/LessonList';
 import { StatusPill } from '@/components/dashboard/StatusPill';
 import { SettingsPage } from '@/components/settings/SettingsPage';
 import { LoginPage } from '@/components/auth/LoginPage';
+import { BottomNav } from '@/components/layout/BottomNav';
 import type { AppState, Language, DayId } from '@/types';
 import { parse, isWithinInterval, format } from 'date-fns';
 import { i18n } from '@/lib/i18n';
@@ -253,6 +254,14 @@ function App() {
             onBack={() => setCurrentView('dashboard')}
           />
         ))}
+
+      {isAuthenticated && (
+        <BottomNav
+          currentView={currentView}
+          onViewChange={setCurrentView}
+          language={state.language}
+        />
+      )}
     </div>
   );
 }

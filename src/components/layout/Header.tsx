@@ -129,7 +129,7 @@ export function Header({ schoolName, subtitle, theme, toggleTheme, language, set
 
                             <button
                                 onClick={onSettingsClick}
-                                className="w-9 h-9 md:w-11 md:h-11 flex items-center justify-center rounded-xl md:rounded-2xl bg-black/[0.03] dark:bg-white/5 border border-black/[0.03] dark:border-white/5 active:scale-90 transition-all shadow-sm hover:bg-black/[0.06] dark:hover:bg-white/10"
+                                className="hidden md:flex w-9 h-9 md:w-11 md:h-11 items-center justify-center rounded-xl md:rounded-2xl bg-black/[0.03] dark:bg-white/5 border border-black/[0.03] dark:border-white/5 active:scale-90 transition-all shadow-sm hover:bg-black/[0.06] dark:hover:bg-white/10"
                             >
                                 <Settings size={18} className="text-foreground/80" />
                             </button>

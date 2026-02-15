@@ -57,5 +57,5 @@ export const INITIAL_STATE: AppState = {
     selectedDay: 'Payshanba',
     selectedShift: '1',
     language: 'UZ',
-    theme: 'dark',
+    theme: 'light',
 };
