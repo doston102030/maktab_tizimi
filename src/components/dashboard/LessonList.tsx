@@ -40,18 +40,11 @@ export const LessonList = memo(function LessonList({ lessons, activeLessonId, la
                 return (
                     <div
                         key={lesson.id}
-                        className="flex flex-col w-full gap-4 transition-all duration-500"
+                        className="flex flex-col w-full gap-4 animate-staggered"
                         style={{
-                            animation: `slideIn 0.5s ease-out forwards ${idx * 0.1}s`,
-                            opacity: 0 // Start hidden for animation
+                            animationDelay: `${idx * 0.1}s`,
                         }}
                     >
-                        <style>{`
-                            @keyframes slideIn {
-                                from { opacity: 0; transform: translateY(20px); }
-                                to { opacity: 1; transform: translateY(0); }
-                            }
-                        `}</style>
 
                         <LessonCard
                             lesson={lesson}
@@ -61,15 +54,20 @@ export const LessonList = memo(function LessonList({ lessons, activeLessonId, la
                         >
                             {/* Aura Bell Design (Premium) */}
                             {isActive && (
-                                <div className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 group z-20">
-                                    <div className="relative">
-                                        {/* Glowing Ring */}
-                                        <div className="absolute inset-0 bg-primary/20 rounded-full blur-md animate-pulse scale-150" />
-                                        <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-ios flex items-center justify-center border-primary/30 group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-primary/10">
-                                            <Bell size={20} className="text-primary fill-primary/20 animate-[shake_2s_infinite]" />
+                                <>
+                                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_3s_infinite]" />
+                                    <span className="absolute inset-0 bg-primary/20 animate-aurora rounded-full blur-xl" />
+                                    <span className="absolute inset-0 ring-1 ring-primary/40 rounded-full" />
+                                    <div className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 group z-20">
+                                        <div className="relative">
+                                            {/* Glowing Ring */}
+                                            <div className="absolute inset-0 bg-primary/20 rounded-full blur-md animate-pulse scale-150" />
+                                            <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-ios flex items-center justify-center border-primary/30 group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-primary/10">
+                                                <Bell size={20} className="text-primary fill-primary/20 animate-[shake_2s_infinite]" />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </>
                             )}
                         </LessonCard>
 

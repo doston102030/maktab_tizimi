@@ -458,3 +458,92 @@
   scrollbar-width: none;
   /* Firefox */
 }
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-10deg);
+  }
+
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes wiggle {
+
+  0%,
+  100% {
+    transform: rotate(-5deg) scale(1.1);
+  }
+
+  50% {
+    transform: rotate(5deg) scale(1.1);
+  }
+}
+
+@keyframes float-particle {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.2;
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.2);
+    opacity: 0.4;
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.8);
+    opacity: 0.3;
+  }
+}
+
+@keyframes staggered-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aurora-glow {
+  0% {
+    filter: hue-rotate(0deg) brightness(1);
+  }
+
+  50% {
+    filter: hue-rotate(45deg) brightness(1.2);
+  }
+
+  100% {
+    filter: hue-rotate(0deg) brightness(1);
+  }
+}
+
+.animate-float-particle {
+  animation: float-particle 20s infinite alternate ease-in-out;
+}
+
+.animate-staggered {
+  animation: staggered-fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-aurora {
+  animation: aurora-glow 10s infinite alternate ease-in-out;
+}
+
+.animate-wiggle {
+  animation: wiggle 2s infinite ease-in-out;
+}

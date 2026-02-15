@@ -28,7 +28,8 @@ export const StatusPill = memo(function StatusPill({ status, variant = 'default'
                 {isActive && (
                     <>
                         <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_3s_infinite]" />
-                        <span className="absolute inset-0 bg-primary/5 animate-pulse rounded-full" />
+                        <span className="absolute inset-0 bg-primary/25 animate-aurora rounded-full blur-2xl opacity-60" />
+                        <span className="absolute inset-0 ring-1 ring-primary/40 rounded-full" />
                     </>
                 )}
 
