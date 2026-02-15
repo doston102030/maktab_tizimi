@@ -60,11 +60,8 @@
     scroll-behavior: smooth;
   }
 
-  /* Premium Global Backgrounds */
   body {
     @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
-    /* transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1); */
-    font-family: 'Plus Jakarta Sans', sans-serif;
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
@@ -351,7 +348,7 @@
   }
 
   .glass-ios {
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -359,7 +356,7 @@
   }
 
   .dark .glass-ios {
-    background-color: rgba(10, 12, 20, 0.7);
+    background-color: rgba(10, 12, 20, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(59, 130, 246, 0.2);
@@ -542,6 +539,18 @@
 
 .animate-aurora {
   animation: aurora-glow 10s infinite alternate ease-in-out;
+  will-change: filter;
+}
+
+@media (max-width: 768px) {
+  .animate-aurora {
+    animation-duration: 15s;
+    /* Slower and lighter on mobile */
+  }
+
+  .animate-float-particle {
+    animation-duration: 30s;
+  }
 }
 
 .animate-wiggle {

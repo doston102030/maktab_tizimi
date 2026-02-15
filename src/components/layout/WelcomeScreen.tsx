@@ -31,9 +31,9 @@ export function WelcomeScreen({ onComplete, language }: { onComplete: () => void
         >
             {/* Cinematic Background Particles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[10%] left-[15%] w-64 h-64 bg-primary/10 rounded-full blur-[100px] animate-float-particle" />
-                <div className="absolute bottom-[20%] right-[10%] w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] animate-float-particle animation-delay-2000" />
-                <div className="absolute top-[40%] right-[30%] w-48 h-48 bg-blue-400/5 rounded-full blur-[80px] animate-float-particle animation-delay-4000" />
+                <div className="absolute top-[10%] left-[15%] w-64 h-64 bg-primary/10 rounded-full blur-[60px] md:blur-[100px] animate-float-particle" />
+                <div className="hidden md:block absolute bottom-[20%] right-[10%] w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] animate-float-particle animation-delay-2000" />
+                <div className="hidden md:block absolute top-[40%] right-[30%] w-48 h-48 bg-blue-400/5 rounded-full blur-[80px] animate-float-particle animation-delay-4000" />
             </div>
 
             <div className="flex flex-col items-center gap-10 max-w-2xl px-8 text-center relative z-10">

@@ -56,8 +56,8 @@ export const LessonList = memo(function LessonList({ lessons, activeLessonId, la
                             {isActive && (
                                 <>
                                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_3s_infinite]" />
-                                    <span className="absolute inset-0 bg-primary/20 animate-aurora rounded-full blur-xl" />
-                                    <span className="absolute inset-0 ring-1 ring-primary/40 rounded-full" />
+                                    <span className="absolute inset-0 bg-primary/10 animate-aurora rounded-[2.5rem] blur-lg" />
+                                    <span className="absolute inset-0 ring-1 ring-primary/30 rounded-[2.5rem]" />
                                     <div className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 group z-20">
                                         <div className="relative">
                                             {/* Glowing Ring */}

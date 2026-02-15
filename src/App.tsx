@@ -12,6 +12,7 @@ import { BottomNav } from '@/components/layout/BottomNav';
 import type { AppState, Language, DayId } from '@/types';
 import { parse, isWithinInterval, format } from 'date-fns';
 import { i18n } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 
 import { INITIAL_STATE } from '@/initialState';
 import { translateLessonName } from '@/lib/translate';
@@ -124,104 +125,105 @@ function App() {
     return { text: t.break, variant: 'default' as const };
   }, [activeLessons, currentDaySchedule?.isActive, state.language, state.selectedDay, now]);
 
-  return (
-    <div className="min-h-screen bg-transparent text-foreground flex flex-col items-center relative overflow-x-hidden">
-      {showWelcome && <WelcomeScreen language={state.language} onComplete={handleWelcomeComplete} />}
+  if (showWelcome) {
+    return <WelcomeScreen language={state.language} onComplete={handleWelcomeComplete} />;
+  }
 
+  return (
+    <div className="min-h-screen bg-background text-foreground relative">
       <Toaster position="top-center" toastOptions={{
-        style: {
-          background: 'hsl(var(--card))',
-          color: 'hsl(var(--foreground))',
-          border: '1px solid hsl(var(--border))',
-        },
+        className: 'glass-ios dark:bg-[#0c101d]/90 dark:text-white border-white/10',
+        duration: 3000,
       }} />
 
+      {/* Persistent Background */}
       <div className="mega-mesh" aria-hidden="true">
-        {/* Light Mode Mesh */}
-        <div className="mega-mesh-layer mesh-light">
+        <div className={cn("mega-mesh-layer mesh-light", state.theme === 'dark' ? "opacity-0" : "opacity-100")}>
           <div className="mega-mesh-orb-1" />
           <div className="mega-mesh-orb-2" />
           <div className="mega-mesh-orb-3" />
         </div>
-        {/* Dark Mode Mesh */}
-        <div className="mega-mesh-layer mesh-dark">
+        <div className={cn("mega-mesh-layer mesh-dark", state.theme === 'dark' ? "opacity-100" : "opacity-0")}>
           <div className="mega-mesh-orb-1-dark" />
           <div className="mega-mesh-orb-2-dark" />
           <div className="mega-mesh-orb-3-dark" />
         </div>
       </div>
 
-      {currentView === 'dashboard' ? (
-        <>
-          <Header
-            schoolName={state.config.schoolName}
-            subtitle={state.config.subtitle}
-            theme={state.theme}
-            toggleTheme={toggleTheme}
+      {currentView === 'dashboard' && (
+        <Header
+          schoolName={state.config.schoolName}
+          subtitle={state.config.subtitle}
+          theme={state.theme}
+          toggleTheme={toggleTheme}
+          language={state.language}
+          setLanguage={setLanguage}
+          onSettingsClick={handleSettingsClick}
+        />
+      )}
+
+      <main className={cn(
+        "w-full max-w-3xl mx-auto px-3 sm:px-6 pt-4 md:pt-8 pb-48 space-y-6 md:space-y-8 flex flex-col items-center z-10 transition-all duration-500",
+        currentView !== 'dashboard' && "hidden"
+      )}>
+        <section className="w-full">
+          <DaySelector
+            selectedDay={state.selectedDay}
+            onSelect={handleSelectDay}
             language={state.language}
-            setLanguage={setLanguage}
-            onSettingsClick={handleSettingsClick}
+          />
+        </section>
+
+        <section className="flex flex-col items-center gap-4 sm:gap-8 w-full">
+          <ShiftSelector
+            selectedShift={state.selectedShift}
+            onSelect={handleSelectShift}
+            language={state.language}
           />
 
-          <main className="w-full max-w-3xl px-3 sm:px-6 pb-24 space-y-6 md:space-y-8 flex flex-col items-center mt-2 md:mt-4 z-10 transition-opacity duration-300">
-            <section className="w-full">
-              <DaySelector
-                selectedDay={state.selectedDay}
-                onSelect={handleSelectDay}
-                language={state.language}
-              />
-            </section>
+          <div className="w-full flex justify-center">
+            <StatusPill status={status.text} variant={status.variant} />
+          </div>
+        </section>
 
-            <section className="flex flex-col items-center gap-4 sm:gap-8 w-full">
-              <ShiftSelector
-                selectedShift={state.selectedShift}
-                onSelect={handleSelectShift}
-                language={state.language}
-              />
+        <section className="w-full">
+          {!currentDaySchedule?.isActive && state.selectedDay === 'Yakshanba' ? (
+            <div className="w-full animate-in zoom-in-95 duration-700 fade-in">
+              <div className="glass-card bg-background/40 border-white/10 dark:bg-[#0c101d]/40 rounded-[2.5rem] p-8 sm:p-16 flex flex-col items-center justify-center text-center space-y-8 relative overflow-hidden group shadow-2xl">
+                <div className="absolute top-0 left-1/4 w-32 h-32 bg-emerald-500/20 rounded-full blur-[80px]" />
+                <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-primary/10 rounded-full blur-[100px]" />
 
-              <div className="w-full flex justify-center">
-                <StatusPill status={status.text} variant={status.variant} />
-              </div>
-            </section>
-
-            <section className="w-full">
-              {!currentDaySchedule?.isActive && state.selectedDay === 'Yakshanba' ? (
-                <div className="w-full animate-in zoom-in-95 duration-700 fade-in">
-                  <div className="glass-card bg-background/40 border-white/10 dark:bg-[#0c101d]/40 rounded-[2.5rem] p-8 sm:p-16 flex flex-col items-center justify-center text-center space-y-8 relative overflow-hidden group shadow-2xl">
-                    <div className="absolute top-0 left-1/4 w-32 h-32 bg-emerald-500/20 rounded-full blur-[80px]" />
-                    <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-primary/10 rounded-full blur-[100px]" />
-
-                    <div className="relative">
-                      <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 flex items-center justify-center text-emerald-500 shadow-2xl shadow-emerald-500/20 border border-emerald-500/20 rotate-3 transition-transform duration-500">
-                        <Coffee size={56} className="sm:size-72" />
-                      </div>
-                    </div>
-
-                    <div className="space-y-4 relative z-10">
-                      <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-black uppercase tracking-[0.2em]">
-                        {t.holiday}
-                      </div>
-                      <h3 className="text-4xl sm:text-5xl font-black text-foreground uppercase tracking-tighter">
-                        {t.restDay}
-                      </h3>
-                      <p className="text-muted-foreground text-sm sm:text-base font-medium max-w-sm mx-auto leading-relaxed">
-                        {t.noLessonsToday} <br />
-                        <span className="text-emerald-500/80">{t.enjoyRest}</span>
-                      </p>
-                    </div>
+                <div className="relative">
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 flex items-center justify-center text-emerald-500 shadow-2xl shadow-emerald-500/20 border border-emerald-500/20 rotate-3 transition-transform duration-500">
+                    <Coffee size={56} className="sm:size-72" />
                   </div>
                 </div>
-              ) : (
-                <LessonList
-                  lessons={activeLessons}
-                  activeLessonId={status.activeLessonId}
-                  language={state.language}
-                />
-              )}
-            </section>
-          </main>
-        </>
-      ) : (
+
+                <div className="space-y-4 relative z-10">
+                  <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-black uppercase tracking-[0.2em]">
+                    {t.holiday}
+                  </div>
+                  <h3 className="text-4xl sm:text-5xl font-black text-foreground uppercase tracking-tighter">
+                    {t.restDay}
+                  </h3>
+                  <p className="text-muted-foreground text-sm sm:text-base font-medium max-w-sm mx-auto leading-relaxed">
+                    {t.noLessonsToday} <br />
+                    <span className="text-emerald-500/80">{t.enjoyRest}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <LessonList
+              lessons={activeLessons}
+              activeLessonId={status.activeLessonId}
+              language={state.language}
+            />
+          )}
+        </section>
+      </main>
+
+      {currentView === 'settings' && (
         <SettingsPage
           appState={state}
           onSave={handleSaveState}

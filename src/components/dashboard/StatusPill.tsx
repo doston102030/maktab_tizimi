@@ -28,7 +28,7 @@ export const StatusPill = memo(function StatusPill({ status, variant = 'default'
                 {isActive && (
                     <>
                         <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_3s_infinite]" />
-                        <span className="absolute inset-0 bg-primary/25 animate-aurora rounded-full blur-2xl opacity-60" />
+                        <span className="absolute inset-0 bg-primary/25 animate-aurora rounded-full blur-lg md:blur-2xl opacity-60" />
                         <span className="absolute inset-0 ring-1 ring-primary/40 rounded-full" />
                     </>
                 )}
@@ -40,8 +40,8 @@ export const StatusPill = memo(function StatusPill({ status, variant = 'default'
                 {isRest && (
                     <>
                         <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/5 via-transparent to-teal-500/10 animate-pulse" />
-                        {/* Moving Border Light */}
-                        <div className="absolute -inset-1 bg-[conic-gradient(from_0deg,transparent,rgba(16,185,129,0.3),transparent,transparent)] animate-[spin_4s_linear_infinite]" />
+                        {/* Moving Border Light - Desktop Only */}
+                        <div className="hidden md:block absolute -inset-1 bg-[conic-gradient(from_0deg,transparent,rgba(16,185,129,0.3),transparent,transparent)] animate-[spin_4s_linear_infinite]" />
                     </>
                 )}
 

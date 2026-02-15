@@ -32,16 +32,16 @@ export function LessonCard({ lesson, index, language, isActive, children }: Less
 
         if (active) {
             return cn(
-                "bg-gradient-to-br text-white rotate-3 ring-4 ring-primary/20 scale-110",
+                "bg-gradient-to-br text-white rotate-3 ring-2 ring-white/30 scale-110",
                 config.gradient,
-                "shadow-2xl",
+                "shadow-lg",
                 config.glow
             );
         }
         return cn(
             "bg-gradient-to-br text-white/95 group-hover:text-white group-hover:rotate-0 -rotate-2 opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500",
             config.gradient,
-            config.shadow,
+            "shadow-md",
             config.glow
         );
     };
@@ -69,10 +69,12 @@ export function LessonCard({ lesson, index, language, isActive, children }: Less
 
             {/* Asymmetrical Active Bar */}
             {isActive && (
-                <div className="absolute left-0 top-3 bottom-3 w-1.5 rounded-r-full bg-gradient-to-b from-primary to-indigo-400 shadow-[0_0_20px_rgba(124,58,237,0.6)]" />
+                <div className="absolute left-0 top-3 bottom-3 w-1.5 rounded-r-full bg-gradient-to-b from-primary to-indigo-400 shadow-[0_0_15px_rgba(124,58,237,0.4)]" />
             )}
 
-            <div className="flex items-center gap-4 w-full overflow-hidden">
+            {children}
+
+            <div className="flex items-center gap-4 w-full overflow-hidden relative z-10">
                 {/* Index Circle */}
                 <div className={cn(
                     "flex shrink-0 items-center justify-center w-12 h-12 rounded-2xl font-black text-base transition-all duration-500",
@@ -105,8 +107,6 @@ export function LessonCard({ lesson, index, language, isActive, children }: Less
                     </div>
                 </div>
             </div>
-
-            {children}
 
             {/* Status Icon/Indicator (Optional, kept minimal) */}
             {isActive && (

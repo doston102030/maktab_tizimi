@@ -311,30 +311,10 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
     );
 
     return (
-
-        <div className="min-h-screen bg-transparent pb-20 animate-in fade-in duration-500">
-            {/* Sticky Header */}
-            <header className="sticky top-0 z-40 w-full glass-ios shadow-sm rounded-b-2xl mx-auto max-w-5xl">
-                <div className="flex h-16 items-center justify-between px-6">
-                    <Button
-                        onClick={onBack}
-                        className="rounded-xl bg-primary/10 hover:bg-primary/20 text-primary font-bold shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-2 border border-primary/10"
-                    >
-                        <ArrowLeft size={18} />
-                        {t.back}
-                    </Button>
-                    <div className="flex items-center gap-3">
-                        <h1 className="text-xl font-bold tracking-tight text-foreground">{t.settings}</h1>
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-primary/20">
-                            <Settings size={20} />
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <main className="max-w-5xl mx-auto p-4 sm:p-8 space-y-8">
+        <div className="min-h-screen bg-transparent animate-in fade-in duration-500 relative flex flex-col">
+            <main className="w-full p-4 sm:p-8 space-y-8 pb-48 pt-20 sm:pt-24">
                 {/* General Settings Section */}
-                <section className="glass-card rounded-3xl p-6 md:p-8">
+                <section className="glass-card rounded-3xl p-6 md:p-8 max-w-5xl mx-auto w-full">
                     <GeneralSettings
                         schoolName={draftState.config.schoolName}
                         onSchoolNameChange={updateSchoolName}
@@ -349,7 +329,7 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                 </section>
 
                 {/* Schedule Editor Section */}
-                <section className="space-y-8">
+                <section className="space-y-8 max-w-5xl mx-auto w-full">
                     <div className="flex flex-col items-center text-center space-y-3 px-2">
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest">
                             {t.schedule}
@@ -379,13 +359,32 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                 </section>
 
                 {/* Device Settings Section */}
-                <section className="bg-gradient-to-br from-card/40 to-secondary/40 backdrop-blur-md rounded-3xl border border-white/10 shadow-sm p-6 md:p-8">
+                <section className="bg-gradient-to-br from-card/40 to-secondary/40 backdrop-blur-md rounded-3xl border border-white/10 shadow-sm p-6 md:p-8 max-w-5xl mx-auto w-full">
                     <DeviceSettings appState={draftState} selectedDay={editDay} language={appState.language} />
                 </section>
             </main>
 
+            {/* pinned Header - Locked to Top */}
+            <header className="fixed top-0 left-0 right-0 z-[100] w-full flex justify-center py-2 px-3 border-b border-white/5 glass-ios">
+                <div className="w-full max-w-5xl px-3 h-14 flex items-center justify-between">
+                    <Button
+                        onClick={onBack}
+                        className="rounded-xl bg-primary/10 hover:bg-primary/20 text-primary font-bold shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-2 border border-primary/10"
+                    >
+                        <ArrowLeft size={18} />
+                        {t.back}
+                    </Button>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-lg font-bold tracking-tight text-foreground">{t.settings}</h1>
+                        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                            <Settings size={18} />
+                        </div>
+                    </div>
+                </div>
+            </header>
+
             {/* Floating Save Bar */}
-            <div className="fixed bottom-8 left-0 right-0 px-4 flex justify-center z-50 pointer-events-none">
+            <div className="fixed bottom-6 left-0 right-0 px-4 flex justify-center z-50 pointer-events-none">
                 <div className="glass-ios bg-background/95 dark:bg-[#0c101d]/95 border border-white/20 shadow-2xl rounded-full p-2 pr-2 pl-8 flex items-center gap-6 pointer-events-auto max-w-lg w-full animate-in slide-in-from-bottom-12 duration-500 hover:scale-105 transition-transform">
                     <span className="text-sm font-bold text-foreground/80 flex-1 truncate text-center">
                         {hasInvalidTime ? t.timeError : t.saveReminder}
