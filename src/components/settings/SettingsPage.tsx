@@ -365,7 +365,7 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
             </main>
 
             {/* pinned Header - Locked to Top */}
-            <header className="fixed top-0 left-0 right-0 z-[100] w-full flex justify-center py-2 px-3 border-b border-white/5 glass-ios">
+            <header className="fixed top-0 left-0 right-0 z-[100] w-full flex justify-center py-2 px-3 border-b border-white/5 glass-ios bg-white dark:bg-[#0a0c14]">
                 <div className="w-full max-w-5xl px-3 h-14 flex items-center justify-between">
                     <Button
                         onClick={onBack}

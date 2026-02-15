@@ -12,7 +12,7 @@ interface LessonCardProps {
     children?: React.ReactNode;
 }
 
-export function LessonCard({ lesson, index, language, isActive, children }: LessonCardProps) {
+export const LessonCard = React.memo(function LessonCard({ lesson, index, language, isActive, children }: LessonCardProps) {
 
     // Dynamic translation for lesson names (handles "1-dars", "2-dars" etc)
     const displayName = React.useMemo(() =>
@@ -114,4 +114,4 @@ export function LessonCard({ lesson, index, language, isActive, children }: Less
             )}
         </div>
     );
-}
+});

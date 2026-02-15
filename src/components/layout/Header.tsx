@@ -64,7 +64,7 @@ export const Header = memo(function Header({ schoolName, subtitle, theme, toggle
     return (
         <header className="sticky top-0 z-[100] w-full transition-all duration-300 px-3 sm:px-6 py-2 bg-transparent isolate" style={{ transform: 'translateZ(0)' }}>
             {/* Glass Background Container - Compact Floating Island */}
-            <div className="w-full max-w-7xl mx-auto glass-ios rounded-3xl md:rounded-[2.5rem] shadow-xl">
+            <div className="w-full max-w-7xl mx-auto glass-ios bg-white dark:bg-[#0a0c14] rounded-3xl md:rounded-[2.5rem] shadow-xl">
                 <div className="px-3 md:px-8 py-2 md:py-3 md:h-28 flex flex-col items-center justify-between gap-y-0.5 md:gap-y-0 relative">
 
                     {/* Top Row: Logo/Name + Controls (One Row on Mobile) */}

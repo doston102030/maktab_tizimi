@@ -28,7 +28,7 @@ export const BottomNav = memo(function BottomNav({ currentView, onViewChange, la
 
     return (
         <nav className="fixed bottom-4 left-1/2 z-[100] w-auto min-w-[240px] md:hidden isolate" style={{ transform: 'translateX(-50%) translateZ(0)' }}>
-            <div className="glass-ios rounded-full p-1.5 flex items-center justify-center gap-1 shadow-2xl border-white/20 dark:border-white/10">
+            <div className="glass-ios bg-white dark:bg-[#0a0c14] rounded-full p-1.5 flex items-center justify-center gap-1 shadow-2xl border-white/20 dark:border-white/10">
                 {navItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = currentView === item.id;
