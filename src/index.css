@@ -62,7 +62,7 @@
 
   /* Premium Global Backgrounds */
   body {
-    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-700;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary transition-colors duration-500;
     font-family: 'Plus Jakarta Sans', sans-serif;
     min-height: 100vh;
     position: relative;
@@ -77,6 +77,7 @@
     overflow: hidden;
     pointer-events: none;
     background-color: var(--background);
+    transition: background-color 0.5s ease;
   }
 
   .mega-mesh::before,
@@ -84,9 +85,10 @@
   [class*="mega-mesh-orb-"] {
     content: '';
     position: absolute;
-    filter: blur(100px);
+    filter: blur(80px);
     border-radius: 50%;
     opacity: 0.15;
+    will-change: transform, opacity;
     mix-blend-mode: normal;
     animation: floatingOrb 25s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
     pointer-events: none;
@@ -271,7 +273,7 @@
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 0.5s ease;
   }
 
   .dark .glass-card {

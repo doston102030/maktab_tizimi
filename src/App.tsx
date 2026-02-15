@@ -255,7 +255,7 @@ function App() {
           />
         ))}
 
-      {isAuthenticated && (
+      {isAuthenticated && currentView !== 'settings' && (
         <BottomNav
           currentView={currentView}
           onViewChange={setCurrentView}
