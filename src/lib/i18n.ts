@@ -34,7 +34,19 @@ export const i18n = {
         disconnected: 'Uzilgan',
         syncTime: 'Vaqtni sinxronlash',
         testBell: 'Bell test',
-        uploadSchedule: 'Jadvalni yuklash'
+        uploadSchedule: 'Jadvalni yuklash',
+        saveReminder: "O'zgarishlarni saqlashni unutmang",
+        scheduleDescription: "Haftalik dars jadvalini shakllantiring va qo'ng'iroq vaqtlarini sozlang",
+        standardScheduleLoaded: "Standart jadval yuklandi",
+        restDay: "Dam olish kuni",
+        noLessonsToday: "Bugun maktabda darslar mavjud emas.",
+        enjoyRest: "Maroqli hordiq chiqaring!",
+        holiday: "Hordiq",
+        temporaryDisable: "Vaqtincha o'chirish",
+        enable: "Yoqish",
+        units: "ta",
+        standard5HourSchedule: "Standart 5 soatlik jadval",
+        schoolNamePlaceholder: "Maktab nomi"
     },
     RU: {
         dushanba: 'Понедельник',
@@ -68,7 +80,19 @@ export const i18n = {
         disconnected: 'Отключено',
         syncTime: 'Синхронизация времени',
         testBell: 'Тест звонка',
-        uploadSchedule: 'Загрузить расписание'
+        uploadSchedule: 'Загрузить расписание',
+        saveReminder: "Не забудьте сохранить изменения",
+        scheduleDescription: "Сформируйте еженедельное расписание и настройте время звонков",
+        standardScheduleLoaded: "Стандартное расписание загружено",
+        restDay: "Выходной день",
+        noLessonsToday: "Сегодня в школе нет уроков.",
+        enjoyRest: "Приятного отдыха!",
+        holiday: "Отдых",
+        temporaryDisable: "Временно отключить",
+        enable: "Включить",
+        units: "",
+        standard5HourSchedule: "Стандартное 5-часовое расписание",
+        schoolNamePlaceholder: "Название школы"
     },
     EN: {
         dushanba: 'Monday',
@@ -102,7 +126,19 @@ export const i18n = {
         disconnected: 'Disconnected',
         syncTime: 'Sync Time',
         testBell: 'Test Bell',
-        uploadSchedule: 'Upload Schedule'
+        uploadSchedule: 'Upload Schedule',
+        saveReminder: "Don't forget to save changes",
+        scheduleDescription: "Set up the weekly lesson schedule and bell times",
+        standardScheduleLoaded: "Standard schedule loaded",
+        restDay: "Rest day",
+        noLessonsToday: "No lessons in school today.",
+        enjoyRest: "Enjoy your rest!",
+        holiday: "Holiday",
+        temporaryDisable: "Temporary disable",
+        enable: "Enable",
+        units: "",
+        standard5HourSchedule: "Standard 5-hour schedule",
+        schoolNamePlaceholder: "School Name"
     }
 };
 

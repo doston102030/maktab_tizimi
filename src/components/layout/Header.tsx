@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Sun, Moon, Settings, Globe, Bell } from 'lucide-react';
 import type { Language, Theme } from '@/types';
 import { cn } from '@/lib/utils';
@@ -32,7 +32,7 @@ function Clock({ language }: { language: Language }) {
                     <span className="text-sm text-muted-foreground/60 mx-0.5 animate-pulse">:</span>
                     {format(time, 'ss')}
                 </div>
-                <div className="text-[8px] font-bold text-muted-foreground/50 uppercase tracking-widest mt-1.5 opacity-60">
+                <div className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-widest mt-1.5 opacity-60">
                     {format(time, 'EEEE • d MMMM', { locale: LOCALE_MAP[language] })}
                 </div>
             </div>
@@ -49,7 +49,7 @@ function Clock({ language }: { language: Language }) {
                         </span>
                     </div>
                     {/* Added missing mobile date */}
-                    <div className="text-[7px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em] mt-0.5">
+                    <div className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em] mt-0.5">
                         {format(time, 'EEEE • d MMMM', { locale: LOCALE_MAP[language] })}
                     </div>
                 </div>
@@ -58,7 +58,7 @@ function Clock({ language }: { language: Language }) {
     );
 }
 
-export function Header({ schoolName, subtitle, theme, toggleTheme, language, setLanguage, onSettingsClick }: HeaderProps) {
+export const Header = memo(function Header({ schoolName, subtitle, theme, toggleTheme, language, setLanguage, onSettingsClick }: HeaderProps) {
     const [isLangOpen, setIsLangOpen] = useState(false);
 
     return (
@@ -142,4 +142,4 @@ export function Header({ schoolName, subtitle, theme, toggleTheme, language, set
             </div>
         </header>
     );
-}
+});

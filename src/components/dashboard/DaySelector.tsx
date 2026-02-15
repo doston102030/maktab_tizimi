@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { DayId, Language } from '@/types';
 import { cn } from '@/lib/utils';
 import { i18n } from '@/lib/i18n';
@@ -21,7 +22,7 @@ interface DaySelectorProps {
     language: Language;
 }
 
-export function DaySelector({ selectedDay, onSelect, language }: DaySelectorProps) {
+export const DaySelector = memo(function DaySelector({ selectedDay, onSelect, language }: DaySelectorProps) {
     const t = i18n[language];
 
     // Detect today's day (0-6, where 0 is Sunday, 1 is Monday)
@@ -97,4 +98,4 @@ export function DaySelector({ selectedDay, onSelect, language }: DaySelectorProp
             </div>
         </div>
     );
-}
+});

@@ -38,7 +38,7 @@ export function GeneralSettings({ schoolName, onSchoolNameChange, activeDays, on
                     <Input
                         value={schoolName}
                         onChange={(e) => onSchoolNameChange(e.target.value)}
-                        placeholder="School Name"
+                        placeholder={t.schoolNamePlaceholder}
                         className="max-w-md h-10 md:h-11 text-base"
                     />
                 </div>

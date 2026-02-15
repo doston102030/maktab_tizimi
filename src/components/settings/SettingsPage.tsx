@@ -296,7 +296,7 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                 }
             }
         }));
-        toast.success("Standart jadval yuklandi");
+        toast.success(t.standardScheduleLoaded);
     };
 
     // Active days list for GeneralSettings
@@ -352,11 +352,11 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
                 <section className="space-y-8">
                     <div className="flex flex-col items-center text-center space-y-3 px-2">
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest">
-                            {i18n.UZ.schedule === t.schedule ? 'Dars Jadvali' : t.schedule}
+                            {t.schedule}
                         </div>
                         <h3 className="text-3xl font-black tracking-tight">{t.schedule}</h3>
                         <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                            Haftalik dars jadvalini shakllantiring va qo'ng'iroq vaqtlarini sozlang
+                            {t.scheduleDescription}
                         </p>
                     </div>
 
@@ -388,7 +388,7 @@ export function SettingsPage({ appState, onSave, onBack }: SettingsPageProps) {
             <div className="fixed bottom-8 left-0 right-0 px-4 flex justify-center z-50 pointer-events-none">
                 <div className="glass-ios bg-background/95 dark:bg-[#0c101d]/95 border border-white/20 shadow-2xl rounded-full p-2 pr-2 pl-8 flex items-center gap-6 pointer-events-auto max-w-lg w-full animate-in slide-in-from-bottom-12 duration-500 hover:scale-105 transition-transform">
                     <span className="text-sm font-bold text-foreground/80 flex-1 truncate text-center">
-                        {hasInvalidTime ? t.timeError : "O'zgarishlarni saqlashni unutmang"}
+                        {hasInvalidTime ? t.timeError : t.saveReminder}
                     </span>
                     <Button
                         size="lg"

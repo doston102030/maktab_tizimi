@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { Lesson, Language } from '@/types';
 import { LessonCard } from './LessonCard';
 import { BreakInfo } from './BreakInfo';
@@ -11,7 +12,7 @@ interface LessonListProps {
     language: Language;
 }
 
-export function LessonList({ lessons, activeLessonId, language }: LessonListProps) {
+export const LessonList = memo(function LessonList({ lessons, activeLessonId, language }: LessonListProps) {
     const t = i18n[language];
 
     // Helper to calculate break duration between current lesson end and next lesson start
@@ -80,4 +81,4 @@ export function LessonList({ lessons, activeLessonId, language }: LessonListProp
             })}
         </div>
     );
-}
+});

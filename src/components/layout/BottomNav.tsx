@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Home, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { i18n } from '@/lib/i18n';
@@ -9,7 +10,7 @@ interface BottomNavProps {
     language: Language;
 }
 
-export function BottomNav({ currentView, onViewChange, language }: BottomNavProps) {
+export const BottomNav = memo(function BottomNav({ currentView, onViewChange, language }: BottomNavProps) {
     const t = i18n[language];
 
     const navItems = [
@@ -65,4 +66,4 @@ export function BottomNav({ currentView, onViewChange, language }: BottomNavProp
             </div>
         </nav>
     );
-}
+});

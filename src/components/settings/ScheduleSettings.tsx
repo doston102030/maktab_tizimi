@@ -89,7 +89,7 @@ function LessonRow({
                             "h-9 w-9 rounded-xl transition-all",
                             isActive ? "text-green-500 bg-green-500/10 hover:bg-green-500/20 shadow-sm shadow-green-500/10" : "text-muted-foreground bg-secondary/50 hover:text-primary hover:bg-primary/10"
                         )}
-                        title={isActive ? "Vaqtincha o'chirish" : "Yoqish"}
+                        title={isActive ? t.temporaryDisable : t.enable}
                     >
                         <Power size={18} />
                     </Button>
@@ -140,7 +140,7 @@ function ShiftColumn({
                 </div>
                 <h4 className="font-semibold text-lg tracking-tight">{title}</h4>
                 <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-secondary text-muted-foreground ml-auto whitespace-nowrap">
-                    {lessons.length} ta
+                    {lessons.length} {t.units}
                 </span>
             </div>
 
@@ -204,7 +204,7 @@ export function ScheduleSettings({
                     className="rounded-xl border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-bold px-5 flex items-center gap-2 transition-all hover:scale-105 shadow-sm"
                 >
                     <Sparkles size={16} className="text-primary animate-pulse" />
-                    Standart 5 soatlik jadval
+                    {t.standard5HourSchedule}
                 </Button>
             </div>
 

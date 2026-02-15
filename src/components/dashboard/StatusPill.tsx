@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { cn } from "@/lib/utils";
 import { Coffee } from "lucide-react";
 
@@ -6,7 +7,7 @@ interface StatusPillProps {
     variant?: 'active' | 'finished' | 'default' | 'rest';
 }
 
-export function StatusPill({ status, variant = 'default' }: StatusPillProps) {
+export const StatusPill = memo(function StatusPill({ status, variant = 'default' }: StatusPillProps) {
     const isActive = variant === 'active';
     const isFinished = variant === 'finished';
     const isRest = variant === 'rest';
@@ -68,4 +69,4 @@ export function StatusPill({ status, variant = 'default' }: StatusPillProps) {
             </div>
         </div>
     );
-}
+});
